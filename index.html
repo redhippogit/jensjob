@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jens.jobs — Weil er es selbst nicht tut</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Syne+Mono&display=swap');
+
+:root {
+–bg: #04040a;
+–card: #0d0d16;
+–card-hover: #111120;
+–border: #1a1a2a;
+–border-bright: #282838;
+–accent: #d4ff00;
+–accent-dim: rgba(212,255,0,0.07);
+–accent2: #ff3355;
+–accent3: #3399ff;
+–text: #ffffff;
+–muted: #55556e;
+–muted2: #32324a;
+–tag-bg: #0a0a14;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(–bg); color: var(–text); font-family: ‘Syne’, sans-serif; min-height: 100vh; overflow-x: hidden; position: relative; }
+
+#bgCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+body::after { content:’’; position:fixed; inset:0; background-image:url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 300 300’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘g’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.85’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3CfeColorMatrix type=‘saturate’ values=‘0’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23g)’ opacity=‘0.04’/%3E%3C/svg%3E”); pointer-events:none; z-index:2; }
+
+header, .hero, .divider-wrap, .cat-section, .main, footer { position: relative; z-index: 3; }
+
+header { padding: 36px 52px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+.logo { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.5px; }
+.logo span { color: var(–accent); }
+.header-right { text-align: right; display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+.live-badge { display: flex; align-items: center; gap: 7px; font-family: ‘Syne Mono’, monospace; font-size: 0.58rem; color: var(–muted); letter-spacing: 2px; text-transform: uppercase; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(–accent); flex-shrink: 0; animation: livepulse 2s ease-in-out infinite; }
+@keyframes livepulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(212,255,0,0.5)} 50%{opacity:0.5;box-shadow:0 0 0 5px rgba(212,255,0,0)} }
+.header-date { font-family: ‘Syne Mono’, monospace; font-size: 0.52rem; color: var(–muted2); letter-spacing: 1px; }
+
+.hero { padding: 64px 52px 48px; }
+.hero-eyebrow { font-family: ‘Syne Mono’, monospace; font-size: 0.6rem; letter-spacing: 5px; text-transform: uppercase; color: var(–accent); margin-bottom: 20px; }
+.hero-title { font-size: clamp(3.2rem, 7.5vw, 6rem); font-weight: 800; line-height: 0.9; letter-spacing: -3px; margin-bottom: 28px; }
+.hero-title .line1 { color: var(–text); display: block; }
+.hero-title .line2 { color: var(–accent); display: block; }
+.hero-title .line3 { color: var(–muted); font-size: 0.38em; letter-spacing: -0.5px; font-weight: 600; display: block; margin-top: 14px; }
+.hero-desc { max-width: 480px; font-size: 0.95rem; line-height: 1.75; color: var(–muted); margin-bottom: 52px; }
+.hero-desc strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+.stats-row { display: inline-flex; flex-wrap: wrap; border: 1px solid var(–border); }
+.stat { padding: 20px 32px; border-right: 1px solid var(–border); display: flex; flex-direction: column; gap: 6px; }
+.stat:last-child { border-right: none; }
+.stat-num { font-size: 2.2rem; font-weight: 800; letter-spacing: -2px; line-height: 1; }
+.stat-num.g { color: var(–accent); }
+.stat-num.b { color: var(–accent3); }
+.stat-num.r { color: var(–accent2); }
+.stat-label { font-family: ‘Syne Mono’, monospace; font-size: 0.5rem; letter-spacing: 2px; text-transform: uppercase; color: var(–muted); }
+
+.divider-wrap { padding: 0 52px; }
+.divider { height: 1px; background: var(–border); }
+
+.cat-section { padding: 52px 52px 36px; }
+.section-label { font-family: ‘Syne Mono’, monospace; font-size: 0.58rem; letter-spacing: 4px; text-transform: uppercase; color: var(–muted); margin-bottom: 22px; }
+.cat-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.cat-btn { display: inline-flex; align-items: center; gap: 9px; padding: 11px 20px; background: var(–card); border: 1px solid var(–border); color: rgba(255,255,255,0.6); font-family: ‘Syne’, sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; white-space: nowrap; border-radius: 0; letter-spacing: 0.2px; transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.12s; }
+.cat-btn:hover { border-color: rgba(212,255,0,0.5); color: var(–accent); background: var(–accent-dim); transform: translateY(-2px); }
+.cat-btn.active { background: var(–accent); color: #04040a; border-color: var(–accent); font-weight: 700; }
+.cat-btn.active:hover { transform: translateY(-2px); color: #04040a; }
+.cat-icon { font-size: 0.95rem; line-height: 1; }
+
+.main { padding: 0 52px 100px; }
+
+.placeholder { border: 1px dashed var(–border-bright); padding: 96px 40px; text-align: center; }
+.placeholder-icon { font-size: 2.5rem; margin-bottom: 20px; opacity: 0.2; animation: float 4s ease-in-out infinite; display: block; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.placeholder-text { font-family: ‘Syne Mono’, monospace; font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; color: var(–muted2); line-height: 2.2; }
+
+/* Loader */
+.loader { display: none; padding: 80px 0; text-align: center; }
+.loader.on { display: block; }
+.loader-track { width: 200px; height: 1px; background: var(–border-bright); margin: 0 auto 24px; position: relative; overflow: hidden; }
+.loader-track::after { content:’’; position:absolute; left:-50%; top:0; width:50%; height:100%; background: linear-gradient(90deg, transparent, var(–accent), transparent); animation: scan 0.9s linear infinite; }
+@keyframes scan { 0%{left:-50%} 100%{left:110%} }
+.loader-text { font-family: ‘Syne Mono’, monospace; font-size: 0.58rem; letter-spacing: 3px; text-transform: uppercase; color: var(–muted); transition: opacity 0.25s; }
+
+/* Results */
+.results-meta { display: none; justify-content: space-between; align-items: flex-end; padding: 36px 0 20px; border-bottom: 1px solid var(–border); margin-bottom: 20px; }
+.results-meta.on { display: flex; }
+.results-count { font-size: 3rem; font-weight: 800; letter-spacing: -3px; line-height: 1; color: var(–accent); }
+.results-cat-label { font-family: ‘Syne Mono’, monospace; font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; color: var(–muted); margin-top: 6px; }
+.results-time { font-family: ‘Syne Mono’, monospace; font-size: 0.5rem; color: var(–muted2); text-align: right; line-height: 1.9; white-space: pre; }
+
+.ai-bar { display: none; align-items: flex-start; gap: 20px; background: rgba(255,51,85,0.04); border-left: 2px solid var(–accent2); padding: 18px 24px; margin-bottom: 28px; }
+.ai-bar.on { display: flex; }
+.ai-bar-label { font-family: ‘Syne Mono’, monospace; font-size: 0.48rem; letter-spacing: 2px; text-transform: uppercase; color: var(–accent2); white-space: nowrap; padding-top: 3px; flex-shrink: 0; }
+.ai-bar-text { font-size: 0.82rem; line-height: 1.7; color: rgba(255,255,255,0.7); font-style: italic; }
+
+.job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+
+.job-card { background: var(–card); border: 1px solid var(–border); padding: 26px; display: flex; flex-direction: column; gap: 14px; transition: border-color 0.2s, background 0.2s, transform 0.2s; animation: cardSlide 0.35s ease both; position: relative; overflow: hidden; }
+.job-card::before { content:’’; position:absolute; top:0; left:0; right:0; height:1px; background: var(–accent); transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease; }
+.job-card:hover { border-color: var(–border-bright); background: var(–card-hover); transform: translateY(-3px); }
+.job-card:hover::before { transform: scaleX(1); }
+@keyframes cardSlide { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.card-num { font-family: ‘Syne Mono’, monospace; font-size: 0.48rem; color: var(–muted2); letter-spacing: 2px; padding-top: 3px; flex-shrink: 0; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; }
+.tag { font-family: ‘Syne Mono’, monospace; font-size: 0.46rem; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; background: var(–tag-bg); color: var(–muted2); border: 1px solid var(–border); }
+.tag.hi { background: rgba(212,255,0,0.07); color: rgba(212,255,0,0.7); border-color: rgba(212,255,0,0.15); }
+.card-title { font-size: 1.05rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.2px; color: var(–text); }
+.card-org { font-family: ‘Syne Mono’, monospace; font-size: 0.58rem; letter-spacing: 1px; text-transform: uppercase; color: var(–muted); margin-top: 4px; }
+.card-remark { font-size: 0.76rem; line-height: 1.65; color: rgba(255,51,85,0.9); font-style: italic; padding: 10px 14px; background: rgba(255,51,85,0.05); border-left: 2px solid rgba(255,51,85,0.25); }
+.card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(–border); margin-top: auto; }
+.card-source { font-family: ‘Syne Mono’, monospace; font-size: 0.48rem; color: var(–muted2); letter-spacing: 1px; text-transform: uppercase; }
+.card-salary { font-family: ‘Syne Mono’, monospace; font-size: 0.52rem; color: var(–accent); letter-spacing: 1px; }
+
+footer { position: relative; z-index: 3; padding: 28px 52px; border-top: 1px solid var(–border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.footer-left { font-family: ‘Syne Mono’, monospace; font-size: 0.52rem; color: var(–muted2); letter-spacing: 1px; line-height: 2; }
+.footer-right { font-family: ‘Syne Mono’, monospace; font-size: 0.44rem; color: var(–muted2); text-align: right; line-height: 2; opacity: 0.5; }
+
+@media (max-width: 640px) {
+header, .hero, .divider-wrap, .cat-section, .main, footer { padding-left: 24px; padding-right: 24px; }
+.hero-title { letter-spacing: -2px; }
+.job-grid { grid-template-columns: 1fr; }
+.stats-row { display: flex; flex-direction: column; border: none; gap: 16px; }
+.stat { border-right: none; border-bottom: 1px solid var(–border); padding: 16px 0; }
+.stat:last-child { border-bottom: none; }
+}
+</style>
+
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<header>
+  <div>
+    <div class="logo">jens<span>.jobs</span></div>
+    <div class="live-badge" style="margin-top:5px"><div class="live-dot"></div>Täglich aktuell · ob er will oder nicht</div>
+  </div>
+  <div class="header-right">
+    <div class="header-date" id="headerDate">—</div>
+    <div style="font-family:'Syne Mono',monospace;font-size:0.46rem;color:var(--muted2);letter-spacing:2px;">BASEL · CH</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Ungebetene Karriereberatung seit 2026</div>
+  <h1 class="hero-title">
+    <span class="line1">Jens sucht.</span>
+    <span class="line2">Wir helfen.</span>
+    <span class="line3">Ob er will oder nicht.</span>
+  </h1>
+  <p class="hero-desc">
+    <strong>Jens van der Meer</strong> arbeitet momentan noch bei der Gemeindeverwaltung Riehen.
+    Diese Seite existiert, weil seine Freunde mehr Ehrgeiz für ihn haben als er selbst.
+    Wähle eine Kategorie. Jens staunt.
+  </p>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num g" id="statSearches">0</div><div class="stat-label">Suchen heute</div></div>
+    <div class="stat"><div class="stat-num b">∞</div><div class="stat-label">Ausreden von Jens</div></div>
+    <div class="stat"><div class="stat-num r">1</div><div class="stat-label">Job den er braucht</div></div>
+  </div>
+</div>
+
+<div class="divider-wrap"><div class="divider"></div></div>
+
+<div class="cat-section">
+  <div class="section-label">Was suchen wir für Jens heute?</div>
+  <div class="cat-buttons">
+    <button class="cat-btn" onclick="doSearch(this,'verwaltung')"><span class="cat-icon">🏛️</span> Noch mehr Verwaltung</button>
+    <button class="cat-btn" onclick="doSearch(this,'privatwirtschaft')"><span class="cat-icon">💼</span> Flucht in die Privatwirtschaft</button>
+    <button class="cat-btn" onclick="doSearch(this,'fuehrung')"><span class="cat-icon">🎯</span> Grosse Chefrolle</button>
+    <button class="cat-btn" onclick="doSearch(this,'sinnstiftend')"><span class="cat-icon">🌱</span> Sinnstiftendes</button>
+    <button class="cat-btn" onclick="doSearch(this,'akademisch')"><span class="cat-icon">🎓</span> Akademisch / Uni Basel</button>
+    <button class="cat-btn" onclick="doSearch(this,'wildcard')"><span class="cat-icon">🎲</span> Überrasch mich</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="placeholder" id="placeholder">
+    <span class="placeholder-icon">👆</span>
+    <div class="placeholder-text">Kategorie wählen<br>dann erscheinen die Stellen für Jens</div>
+  </div>
+  <div class="loader" id="loader">
+    <div class="loader-track"></div>
+    <div class="loader-text" id="loaderText">Analysiere Jens…</div>
+  </div>
+  <div class="results-meta" id="resultsMeta">
+    <div>
+      <div class="results-count" id="resultsCount">0</div>
+      <div class="results-cat-label" id="resultsCatLabel">Stellen gefunden</div>
+    </div>
+    <div class="results-time" id="resultsTime"></div>
+  </div>
+  <div class="ai-bar" id="aiBar">
+    <div class="ai-bar-label">Amtliches Urteil</div>
+    <div class="ai-bar-text" id="aiBarText"></div>
+  </div>
+  <div class="job-grid" id="jobGrid"></div>
+</div>
+
+<footer>
+  <div class="footer-left">
+    jens.jobs — Alle Stellen: Grossraum Basel · 30km Umkreis<br>
+    Quellen: managementstellen.ch · jobs.ch · jobscout24.ch · unibas.ch · bs.ch
+  </div>
+  <div class="footer-right">
+    another stupid redhippo© project.<br>
+    nobody asked for.<br>
+    built with insomnia.
+  </div>
+</footer>
+
+<script>
+/* ═══ BLOB BACKGROUND ═══ */
+(function () {
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  const BLOBS = [
+    { x:0.15, y:0.20, r:0.30, vx: 0.00010, vy: 0.00007, h:240, s:60, l:9  },
+    { x:0.78, y:0.15, r:0.24, vx:-0.00008, vy: 0.00010, h:250, s:50, l:7  },
+    { x:0.50, y:0.62, r:0.34, vx: 0.00006, vy:-0.00009, h:230, s:65, l:11 },
+    { x:0.88, y:0.72, r:0.22, vx:-0.00011, vy:-0.00006, h:260, s:55, l:6  },
+    { x:0.28, y:0.88, r:0.26, vx: 0.00009, vy:-0.00011, h:245, s:45, l:5  },
+    { x:0.62, y:0.38, r:0.19, vx:-0.00007, vy: 0.00013, h:235, s:70, l:8  },
+  ];
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  function draw() {
+    ctx.fillStyle = '#04040a';
+    ctx.fillRect(0, 0, W, H);
+    for (const b of BLOBS) {
+      b.x += b.vx; b.y += b.vy;
+      if (b.x < -0.15 || b.x > 1.15) b.vx *= -1;
+      if (b.y < -0.15 || b.y > 1.15) b.vy *= -1;
+      const cx = b.x * W, cy = b.y * H, r = b.r * Math.max(W, H);
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0,   `hsla(${b.h},${b.s}%,${b.l}%,0.92)`);
+      g.addColorStop(0.45,`hsla(${b.h},${b.s}%,${b.l*.6}%,0.5)`);
+      g.addColorStop(1,   `hsla(${b.h},${b.s}%,${b.l*.2}%,0)`);
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.fillStyle = g; ctx.fill();
+    }
+    // faint scanlines
+    ctx.fillStyle = 'rgba(0,0,0,0.07)';
+    for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 1);
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', resize);
+  resize(); draw();
+})();
+
+/* ═══ DATE ═══ */
+document.getElementById('headerDate').textContent =
+  new Date().toLocaleDateString('de-CH', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+
+/* ═══ COUNTER ═══ */
+let searchCount = parseInt(sessionStorage.getItem('jc') || '0');
+document.getElementById('statSearches').textContent = searchCount;
+
+/* ═══ JOB DATA ═══ */
+const DATA = {
+  verwaltung: {
+    commentary: "Das Amt freut sich, Herrn van der Meer mitteilen zu dürfen, dass seine bisherigen Leistungen in Riehen als solide bezeichnet werden können — im Sinne von: er hat nie etwas Bemerkenswertes getan. Die folgenden Stellen bieten ihm die Möglichkeit, dieses Kunststück zu wiederholen, jedoch mit höherem Titel.",
+    jobs: [
+      { title: "Abteilungsleiter Einwohnerdienste", org: "Gemeinde Muttenz", location: "Muttenz BL", source: "gemeinde-muttenz.ch", remark: "Identische Stelle, anderes Dorf — Jens würde es nach zwei Wochen nicht merken.", salary: "CHF 110–125k", tags: ["100%", "Verwaltung", "Führung"] },
+      { title: "Stv. Gemeindeschreiber", org: "Gemeinde Binningen", location: "Binningen BL", source: "binningen.ch", remark: "Stellvertreter: genug Verantwortung um sich wichtig zu fühlen, zu wenig um Fehler zu machen.", salary: "CHF 105–118k", tags: ["Kader", "100%", "Öffentlich"] },
+      { title: "Leiterin Stadtentwicklung", org: "Stadt Liestal", location: "Liestal BL", source: "liestal.ch", remark: "Endlich Stadtentwicklung in einer Stadt, die sich seit 1972 nicht entwickelt hat.", salary: "CHF 115–130k", tags: ["Leitung", "Kader", "Kanton"] },
+      { title: "Bereichsleiter Soziales & Integration", org: "Kanton Basel-Landschaft", location: "Liestal BL", source: "baselland.ch", remark: "Mehr Bürokratie, mehr Budget, mehr Sitzungen — Jens in seinem Element.", salary: "CHF 120–140k", tags: ["Kanton", "Soziales", "Führung"] },
+      { title: "Generalsekretär Gemeindeverband", org: "Verband Baselbieter Gemeinden", location: "Aesch BL", source: "vbg-bl.ch", remark: "Chef aller Gemeinden — der logische nächste Schritt nach 'einer Gemeinde'.", salary: "CHF 130–150k", tags: ["CEO", "Verband", "100%"] },
+    ]
+  },
+  privatwirtschaft: {
+    commentary: "Das Amt vermerkt mit verhaltener Begeisterung, dass Herr van der Meer die öffentliche Hand verlassen möchte. Die Privatwirtschaft wurde über seine Ankunft noch nicht informiert.",
+    jobs: [
+      { title: "Head of Corporate Affairs", org: "Novartis AG", location: "Basel", source: "novartis.com/jobs", remark: "Öffentliche Verwaltungserfahrung trifft auf Pharmakonzern — Jens würde die erste Woche damit verbringen, das Organigramm zu verstehen.", salary: "CHF 160–200k", tags: ["Pharma", "Kader", "Englisch"] },
+      { title: "Leiter Public Affairs Schweiz", org: "Roche Holding AG", location: "Basel", source: "roche.com/careers", remark: "Behördensprache als Beruf — Jens ist qualified by accident.", salary: "CHF 150–185k", tags: ["Roche", "Führung", "Politik"] },
+      { title: "Geschäftsführer Region Nord", org: "Helvetia Versicherungen", location: "Basel", source: "helvetia.ch/jobs", remark: "Versicherungen verkaufen sich ähnlich wie Gemeindeprospekte — Jens muss nur das Lächeln üben.", salary: "CHF 140–170k", tags: ["Versicherung", "GF", "Vertrieb"] },
+      { title: "Managing Director Schweiz", org: "BKW Energie AG", location: "Basel Region", source: "bkw.ch/careers", remark: "Energie — nicht die Art die Jens nach dem Mittagessen ausstrahlt, sondern die elektrische.", salary: "CHF 155–190k", tags: ["Energie", "MD", "100%"] },
+      { title: "Direktor Facility Management", org: "Swiss Prime Site", location: "Basel", source: "sps.swiss/jobs", remark: "Gebäude verwalten statt Menschen — eine deutliche Qualitätssteigerung für alle Beteiligten.", salary: "CHF 135–160k", tags: ["Immobilien", "Direktion", "FM"] },
+    ]
+  },
+  fuehrung: {
+    commentary: "Das Amt registriert den Wunsch nach einer Führungsposition mit leiser Skepsis. Herr van der Meer hat bislang eine Gemeinde mit 23'000 Einwohnern verwaltet. Das Amt wünscht viel Erfolg.",
+    jobs: [
+      { title: "CEO", org: "IWB — Industrielle Werke Basel", location: "Basel", source: "iwb.ch/jobs", remark: "Wasserversorgung, Strom, Gas für ganz Basel — was könnte schon schiefgehen.", salary: "CHF 250–320k", tags: ["CEO", "Stadtwerk", "VR"] },
+      { title: "Stadtpräsident ad interim", org: "Stadt Laufen", location: "Laufen BL", source: "laufen.ch", remark: "Chef einer ganzen Stadt — zugegeben, es ist Laufen, aber immerhin.", salary: "CHF 145–165k", tags: ["CEO", "Stadt", "Politik"] },
+      { title: "Generaldirektor", org: "Kantonsspital Baselland", location: "Bruderholz BL", source: "ksbl.ch/jobs", remark: "Ein Spital leiten ohne Medizinstudium — in der Schweiz durchaus möglich und üblich.", salary: "CHF 280–350k", tags: ["GD", "Spital", "Kader"] },
+      { title: "Direktor Messe Basel", org: "MCH Group AG", location: "Basel", source: "mch-group.com", remark: "Art Basel, Uhren & Schmuck — Jens würde täglich die Gästeliste kontrollieren müssen.", salary: "CHF 230–290k", tags: ["Direktor", "Events", "International"] },
+      { title: "CEO", org: "Basler Verkehrs-Betriebe (BVB)", location: "Basel", source: "bvb.ch/karriere", remark: "Trams leiten ist wie Verwaltung, nur dass die Leute wütend werden wenn es zu spät kommt.", salary: "CHF 240–300k", tags: ["CEO", "Öffentlich", "Tram"] },
+    ]
+  },
+  sinnstiftend: {
+    commentary: "Das Amt begrüsst den Wunsch nach sinnstiftender Tätigkeit, erlaubt sich jedoch zu vermerken, dass 'Sinn' kein Gehaltsersatz ist — die folgenden Stellen bieten beides, wenn auch unterschiedlich gewichtet.",
+    jobs: [
+      { title: "Geschäftsführer", org: "Pro Infirmis Basel", location: "Basel", source: "proinfirmis.ch/jobs", remark: "Menschen helfen statt Formulare abzeichnen — ein radikaler Karriereschritt.", salary: "CHF 115–135k", tags: ["NGO", "GF", "Soziales"] },
+      { title: "Direktor", org: "Schweizerisches Tropen- und Public Health-Institut", location: "Basel", source: "swisstph.ch/jobs", remark: "Tropenmedizin ohne Tropen — typisch Basel.", salary: "CHF 130–155k", tags: ["Institut", "Global Health", "Direktor"] },
+      { title: "Stiftungsleitung", org: "Christoph Merian Stiftung", location: "Basel", source: "cms-basel.ch", remark: "Eine der reichsten Stiftungen der Schweiz leiten — der Sinn ist inklusive.", salary: "CHF 140–170k", tags: ["Stiftung", "Leitung", "Kultur"] },
+      { title: "Generalsekretär", org: "SRK Kantonalverband Basel", location: "Basel", source: "srk-bs.ch/jobs", remark: "Rotes Kreuz — endlich eine Organisation mit wirklich gutem Logo.", salary: "CHF 110–130k", tags: ["NGO", "GS", "Soziales"] },
+      { title: "Bereichsleiter Umwelt & Energie", org: "WWF Region Basel", location: "Basel", source: "wwf.ch/de/jobs", remark: "Jens kämpft für die Welt — die Welt kämpft gegen Jens' Pendlerpauschale.", salary: "CHF 95–115k", tags: ["NGO", "Umwelt", "80–100%"] },
+    ]
+  },
+  akademisch: {
+    commentary: "Das Amt nimmt zur Kenntnis, dass Herr van der Meer eine akademische Laufbahn anstrebt. Ein Doktortitel ist keine Voraussetzung, wird jedoch die Überraschung im Vorstellungsgespräch mildern.",
+    jobs: [
+      { title: "Verwaltungsdirektor", org: "Universität Basel", location: "Basel", source: "unibas.ch/jobs", remark: "Die älteste Universität der Schweiz braucht jemanden der die Formulare kennt — Jens ist ready.", salary: "CHF 150–175k", tags: ["Uni", "Direktor", "100%"] },
+      { title: "Generalsekretär", org: "Fachhochschule Nordwestschweiz FHNW", location: "Muttenz / Basel", source: "fhnw.ch/jobs", remark: "Vier Kantone, eine Hochschule, unendlich viele Sitzungen — Jens' natürliches Habitat.", salary: "CHF 140–165k", tags: ["FH", "GS", "Kader"] },
+      { title: "Leiter Administration & Services", org: "Friedrich Miescher Institute", location: "Basel", source: "fmi.ch/jobs", remark: "Weltklasse-Forschung verwalten — Jens muss nicht verstehen was sie forschen, nur die Budgets.", salary: "CHF 125–145k", tags: ["Forschung", "Leitung", "International"] },
+      { title: "Campus Manager", org: "European School Basel", location: "Münchenbuchsee", source: "esb.ch/jobs", remark: "Schule für Diplomatenkinder — die einzige Institution wo Schweizer Verwaltungssprache Exotik ist.", salary: "CHF 110–130k", tags: ["Schule", "Kader", "International"] },
+      { title: "Abteilungsleiter Forschungsförderung", org: "Swiss National Science Foundation", location: "Bern / Basel", source: "snf.ch/jobs", remark: "Geld verteilen an kluge Leute — endlich ein Job der zur Persönlichkeit passt.", salary: "CHF 130–150k", tags: ["SNSF", "Leitung", "Wissenschaft"] },
+    ]
+  },
+  wildcard: {
+    commentary: "Das Amt hat im Rahmen einer ausserordentlichen Sitzung beschlossen, vollständig auf Jens' Qualifikationsprofil zu verzichten. Die folgenden Resultate sind das Ergebnis.",
+    jobs: [
+      { title: "Kurdirektor", org: "Gemeinde Binz (Rügen)", location: "Rügen, DE", source: "binz.de/jobs", remark: "Meer inklusive — van der Meer leitet van dem Meer. Das Schicksal wäre komplett.", salary: "EUR 85–105k", tags: ["Meer!", "Tourismus", "Direktor"] },
+      { title: "Lotteriefonds-Verwalter", org: "Kanton Basel-Stadt", location: "Basel", source: "bs.ch/lotterie", remark: "Anderen Leuten ihr Glück verwalten — das ist eigentlich das was Jens immer getan hat.", salary: "CHF 120–140k", tags: ["Lotterie", "Kanton", "Kurios"] },
+      { title: "Hafenkapitän", org: "Rheinhäfen Basel", location: "Basel", source: "rheinhaefen.ch/jobs", remark: "Van der Meer leitet den Hafen — linguistisch die einzig vertretbare Karriereoption.", salary: "CHF 130–155k", tags: ["Hafen", "Meer", "Chef"] },
+      { title: "Leiter Zoo-Verwaltung", org: "Zoologischer Garten Basel", location: "Basel", source: "zoobasel.ch/jobs", remark: "Tiere verwalten ist wie Gemeindeverwaltung, nur dass die Bewohner bissiger sind.", salary: "CHF 115–135k", tags: ["Zoo", "Kurios", "Leitung"] },
+      { title: "Chief Happiness Officer", org: "Baloise Group", location: "Basel", source: "baloise.com/jobs", remark: "Diese Stelle existiert wirklich. Das sagt alles über die Privatwirtschaft.", salary: "CHF 140–170k", tags: ["CHO", "WTF", "Happiness"] },
+    ]
+  }
+};
+
+/* ═══ SEARCH ═══ */
+let activeBtn = null;
+
+const LOADERS = {
+  verwaltung:       ['Durchsuche Gemeinderäte…', 'Prüfe Verwaltungsstellen…', 'Finde bürokratische Heimat…'],
+  privatwirtschaft: ['Verlasse sicheren Hafen…', 'Suche Bonus-Kultur…', 'Prüfe Firmenwagen-Optionen…'],
+  fuehrung:         ['Prüfe CEO-Stühle…', 'Suche Direktionsstellen…', 'Messe Bürogrösse…'],
+  sinnstiftend:     ['Suche höheren Zweck…', 'Prüfe Weltrettungspotenzial…', 'Kalkuliere Sinngehalt…'],
+  akademisch:       ['Durchsuche Hörsäle…', 'Prüfe unibas.ch…', 'Suche Professorenstühle…'],
+  wildcard:         ['Würfle Karriere…', 'Konsultiere Sterne…', 'Ignoriere Qualifikationen…'],
+};
+
+function doSearch(btn, cat) {
+  if (activeBtn) { activeBtn.classList.remove('active'); }
+  btn.classList.add('active');
+  activeBtn = btn;
+
+  searchCount++;
+  sessionStorage.setItem('jc', searchCount);
+  document.getElementById('statSearches').textContent = searchCount;
+
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('resultsMeta').classList.remove('on');
+  document.getElementById('aiBar').classList.remove('on');
+  document.getElementById('jobGrid').innerHTML = '';
+
+  const loader = document.getElementById('loader');
+  const loaderText = document.getElementById('loaderText');
+  loader.classList.add('on');
+
+  const texts = LOADERS[cat];
+  let li = 0;
+  loaderText.textContent = texts[0];
+  const iv = setInterval(() => {
+    li = (li + 1) % texts.length;
+    loaderText.style.opacity = '0';
+    setTimeout(() => { loaderText.textContent = texts[li]; loaderText.style.opacity = '1'; }, 220);
+  }, 1800);
+
+  // Fake delay for dramatic effect
+  setTimeout(() => {
+    clearInterval(iv);
+    loader.classList.remove('on');
+    render(DATA[cat], cat);
+  }, 1800 + Math.random() * 800);
+}
+
+function render(data, cat) {
+  const jobs = data.jobs;
+  document.getElementById('resultsCount').textContent = jobs.length;
+  document.getElementById('resultsCatLabel').textContent = `Stellen · ${cat}`;
+  document.getElementById('resultsMeta').classList.add('on');
+
+  const now = new Date();
+  document.getElementById('resultsTime').textContent =
+    `Aktualisiert\n${now.toLocaleDateString('de-CH')} · ${now.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'})}`;
+
+  document.getElementById('aiBarText').textContent = data.commentary;
+  document.getElementById('aiBar').classList.add('on');
+
+  const grid = document.getElementById('jobGrid');
+  grid.innerHTML = '';
+
+  jobs.forEach((job, i) => {
+    const tagsHTML = job.tags.map((t, ti) =>
+      `<span class="tag${ti === 0 ? ' hi' : ''}">${t}</span>`
+    ).join('');
+
+    const card = document.createElement('div');
+    card.className = 'job-card';
+    card.style.animationDelay = `${i * 0.07}s`;
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-num">${String(i+1).padStart(2,'0')} / ${String(jobs.length).padStart(2,'0')}</div>
+        <div class="card-tags">${tagsHTML}</div>
+      </div>
+      <div>
+        <div class="card-title">${job.title}</div>
+        <div class="card-org">${job.org} · ${job.location}</div>
+      </div>
+      <div class="card-remark">${job.remark}</div>
+      <div class="card-footer">
+        <div class="card-source">via ${job.source}</div>
+        <div class="card-salary">${job.salary}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+</script>
+
+</body>
+</html>
