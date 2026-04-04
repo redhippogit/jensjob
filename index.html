@@ -6,937 +6,497 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jens.jobs — Weil er es selbst nicht tut</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Syne+Mono&display=swap');
 
-/* ═══════════════════════════════════════════════
-FONTS — embedded, no CDN dependency
-═══════════════════════════════════════════════ */
-@import url(‘https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Syne+Mono&display=swap’);
-
-/* System font fallback stack if Google Fonts blocked */
 :root {
-–f-sans: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Segoe UI’, Helvetica, Arial, sans-serif;
-–f-mono: ‘Syne Mono’, ‘SF Mono’, ‘Fira Code’, ‘Courier New’, monospace;
-
-/* COLORS — tested for WCAG AA on dark bg */
-–bg:      #03030e;
-–card:    #09091e;
-–cardhi:  #0e0e28;
-–bdr:     #232348;
-–bdrhi:   #303060;
-–lime:    #ccff00;   /* primary accent */
-–limehi:  #ddff44;   /* hover accent */
-–red:     #ff4466;
-–blue:    #44aaff;
-–white:   #ffffff;
-–silver:  #d0d0f0;
-–grey:    #9090c0;
-–dim:     #606090;
-–dimmer:  #404068;
+–bg:    #050510;
+–card:  #0c0c20;
+–cardhi:#121228;
+–bdr:   #1e1e3a;
+–bdrhi: #2a2a50;
+–lime:  #c8ff00;
+–red:   #ff4455;
+–blue:  #44aaff;
+–white: #ffffff;
+–silver:#d4d4f0;
+–grey:  #8888b0;
+–dim:   #555578;
+–sans:  ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, Arial, sans-serif;
+–mono:  ‘Syne Mono’, ‘SF Mono’, ‘Courier New’, monospace;
 }
 
-/* ═══ RESET ═══ */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+html { scroll-behavior:smooth; }
 body {
 background: var(–bg);
 color: var(–white);
-font-family: var(–f-sans);
-font-size: 16px;
-line-height: 1.5;
+font-family: var(–sans);
 min-height: 100vh;
 overflow-x: hidden;
+position: relative;
 }
 
-/* ═══ LAYERS ═══ */
-#bgc   { position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
-#grain { position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.025;
-background-image:url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.85’ numOctaves=‘4’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’/%3E%3C/svg%3E”); }
-#bar   { position:fixed; top:0; left:0; height:3px; width:0; background:var(–lime); z-index:100; transition:width .1s; }
+/* ═══ CSS ANIMATED BACKGROUND ═══
+Pure CSS blobs — no canvas, works everywhere */
+.bg-wrap {
+position: fixed;
+inset: 0;
+z-index: 0;
+overflow: hidden;
+pointer-events: none;
+}
 
+.blob {
+position: absolute;
+border-radius: 50%;
+filter: blur(80px);
+opacity: 0.55;
+animation: blobmove linear infinite;
+will-change: transform;
+}
+
+.b1 {
+width: 500px; height: 500px;
+background: radial-gradient(circle, #1a1a8a 0%, transparent 70%);
+top: -100px; left: -100px;
+animation-duration: 22s;
+animation-name: b1move;
+}
+.b2 {
+width: 400px; height: 400px;
+background: radial-gradient(circle, #0a0a6a 0%, transparent 70%);
+top: 30%; right: -80px;
+animation-duration: 18s;
+animation-name: b2move;
+}
+.b3 {
+width: 600px; height: 600px;
+background: radial-gradient(circle, #120a5a 0%, transparent 70%);
+bottom: -150px; left: 20%;
+animation-duration: 26s;
+animation-name: b3move;
+}
+.b4 {
+width: 350px; height: 350px;
+background: radial-gradient(circle, #1a0a4a 0%, transparent 70%);
+top: 60%; left: 60%;
+animation-duration: 20s;
+animation-name: b4move;
+}
+.b5 {
+width: 300px; height: 300px;
+background: radial-gradient(circle, #0a1a6a 0%, transparent 70%);
+top: 20%; left: 40%;
+animation-duration: 15s;
+animation-name: b5move;
+}
+
+@keyframes b1move {
+0%   { transform: translate(0, 0) scale(1); }
+25%  { transform: translate(120px, 80px) scale(1.1); }
+50%  { transform: translate(60px, 200px) scale(0.95); }
+75%  { transform: translate(-40px, 120px) scale(1.05); }
+100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes b2move {
+0%   { transform: translate(0, 0) scale(1); }
+33%  { transform: translate(-100px, 60px) scale(1.15); }
+66%  { transform: translate(-60px, -80px) scale(0.9); }
+100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes b3move {
+0%   { transform: translate(0, 0) scale(1); }
+30%  { transform: translate(80px, -60px) scale(1.1); }
+60%  { transform: translate(-50px, -120px) scale(0.95); }
+100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes b4move {
+0%   { transform: translate(0, 0) scale(1); }
+40%  { transform: translate(-80px, -100px) scale(1.2); }
+80%  { transform: translate(60px, -40px) scale(0.85); }
+100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes b5move {
+0%   { transform: translate(0, 0) scale(1); }
+50%  { transform: translate(100px, 80px) scale(1.15); }
+100% { transform: translate(0, 0) scale(1); }
+}
+
+/* Scanlines — subtle */
+.scanlines {
+position: fixed;
+inset: 0;
+z-index: 1;
+pointer-events: none;
+background: repeating-linear-gradient(
+0deg,
+transparent,
+transparent 3px,
+rgba(0,0,0,0.04) 3px,
+rgba(0,0,0,0.04) 4px
+);
+}
+
+/* All content above bg */
 header, .hero, .dw, .sect, main, footer { position:relative; z-index:2; }
 
-/* ═══ REVEAL (safe — visible by default) ═══ */
-.rv { opacity:1; transform:none; }
-.rv.will-animate { opacity:0; transform:translateY(18px); transition:opacity .5s cubic-bezier(.22,1,.36,1), transform .5s cubic-bezier(.22,1,.36,1); }
-.rv.visible { opacity:1 !important; transform:none !important; }
-.rv.d1{transition-delay:.06s} .rv.d2{transition-delay:.12s} .rv.d3{transition-delay:.18s}
-.rv.d4{transition-delay:.24s} .rv.d5{transition-delay:.30s} .rv.d6{transition-delay:.36s}
+/* ═══ SCROLL PROGRESS ═══ */
+#bar {
+position: fixed; top:0; left:0; height:3px; width:0;
+background: var(–lime); z-index:999;
+transition: width .08s;
+}
 
 /* ═══ HEADER ═══ */
 header {
-padding: 24px 48px 22px;
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
+padding: 20px 32px;
+display: flex; justify-content:space-between; align-items:center;
 border-bottom: 1px solid var(–bdr);
-background: rgba(3,3,14,.85);
-backdrop-filter: blur(12px);
--webkit-backdrop-filter: blur(12px);
+background: rgba(5,5,16,.9);
+backdrop-filter: blur(16px);
+-webkit-backdrop-filter: blur(16px);
+position: sticky; top:0; z-index:100;
 }
 
-.logo {
-font-family: var(–f-sans);
-font-size: 1.1rem;
-font-weight: 800;
-letter-spacing: -.5px;
-color: var(–white);
-}
-.logo em { color: var(–lime); font-style: normal; }
+.logo { font-size:1.1rem; font-weight:800; color:var(–white); letter-spacing:-.5px; }
+.logo em { color:var(–lime); font-style:normal; }
 
-.hright { display:flex; flex-direction:column; gap:4px; align-items:flex-end; }
-
+.hright { display:flex; flex-direction:column; align-items:flex-end; gap:3px; }
 .live {
-display: flex; align-items: center; gap: 7px;
-font-family: var(–f-mono);
-font-size: .55rem;
-color: var(–grey);
-letter-spacing: 2px;
-text-transform: uppercase;
+display:flex; align-items:center; gap:6px;
+font-family:var(–mono); font-size:.5rem;
+color:var(–grey); letter-spacing:2px; text-transform:uppercase;
 }
 .dot {
-width: 6px; height: 6px; border-radius: 50%;
-background: var(–lime); flex-shrink: 0;
+width:6px; height:6px; border-radius:50%; background:var(–lime);
 animation: pulse 2s ease-in-out infinite;
 }
 @keyframes pulse {
-0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(204,255,0,.6); }
-50%      { opacity:.4; box-shadow: 0 0 0 6px rgba(204,255,0,0); }
+0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(200,255,0,.5)}
+50%{opacity:.4;box-shadow:0 0 0 5px rgba(200,255,0,0)}
 }
-.hdate {
-font-family: var(–f-mono);
-font-size: .48rem;
-color: var(–dim);
-letter-spacing: 1px;
-}
+.hdate { font-family:var(–mono); font-size:.44rem; color:var(–dim); letter-spacing:1px; }
 
 /* ═══ HERO ═══ */
-.hero { padding: 56px 48px 44px; }
+.hero { padding: 60px 32px 48px; }
 
 .eyebrow {
-font-family: var(–f-mono);
-font-size: .58rem;
-letter-spacing: 5px;
-text-transform: uppercase;
-color: var(–lime);
-margin-bottom: 18px;
-display: block;
+display:block; font-family:var(–mono); font-size:.55rem;
+letter-spacing:5px; text-transform:uppercase; color:var(–lime); margin-bottom:20px;
 }
 
 .htitle {
-font-family: var(–f-sans);
-font-size: clamp(2.8rem, 9vw, 6.5rem);
-font-weight: 800;
-line-height: .9;
-letter-spacing: -3px;
-margin-bottom: 24px;
+font-size: clamp(3rem, 11vw, 7rem);
+font-weight: 800; line-height: .9; letter-spacing: -3px; margin-bottom: 32px;
 }
-.htitle .l1 { display:block; color: var(–white); }
-.htitle .l2 { display:block; color: var(–lime); }
-.htitle .l3 {
-display: block;
-margin-top: 14px;
-font-size: .35em;
-letter-spacing: 0;
-font-weight: 600;
-color: var(–grey);
-letter-spacing: -.5px;
-}
+.htitle .l1 { display:block; color:var(–white); }
+.htitle .l2 { display:block; color:var(–lime); text-shadow:0 0 60px rgba(200,255,0,.2); }
+.htitle .l3 { display:block; margin-top:14px; font-size:.33em; font-weight:700; letter-spacing:-.5px; color:var(–grey); }
 
-/* ═══ PROFILE STRIP ═══ */
+/* ═══ PROFILE ═══ */
 .profile {
-border: 1px solid var(–bdr);
-background: var(–card);
-padding: 20px 24px;
-margin-bottom: 36px;
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 18px 20px;
-position: relative;
-overflow: hidden;
+display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+border:1px solid var(–bdr); margin-bottom:36px;
+background:var(–card);
+position:relative; overflow:hidden;
 }
-.profile::after {
-content: ‘’;
-position: absolute; top: 0; left: -60%; width: 60%; height: 100%;
-background: linear-gradient(90deg, transparent, rgba(204,255,0,.04), transparent);
-animation: shim 6s ease-in-out infinite;
-pointer-events: none;
+/* shimmer sweep */
+.profile::before {
+content:’’; position:absolute; top:0; left:-100%; width:60%; height:100%;
+background:linear-gradient(90deg,transparent,rgba(200,255,0,.05),transparent);
+animation:sweep 5s ease-in-out infinite;
+pointer-events:none; z-index:1;
 }
-@keyframes shim { 0%{left:-60%} 100%{left:130%} }
+@keyframes sweep { 0%{left:-60%} 100%{left:130%} }
 
-.pi { display:flex; flex-direction:column; gap:5px; }
-.pk {
-font-family: var(–f-mono);
-font-size: .46rem;
-letter-spacing: 3px;
-text-transform: uppercase;
-color: var(–grey);
-}
-.pv {
-font-family: var(–f-mono);
-font-size: .7rem;
-color: var(–silver);
-line-height: 1.4;
-}
-.pv.acc { color: var(–lime); }
+.pi { padding:14px 16px; border-right:1px solid var(–bdr); border-bottom:1px solid var(–bdr); }
+.pi:nth-child(3n){border-right:none}
+.pi:nth-last-child(-n+3){border-bottom:none}
+.pk { font-family:var(–mono); font-size:.42rem; letter-spacing:3px; text-transform:uppercase; color:var(–dim); margin-bottom:5px; }
+.pv { font-family:var(–mono); font-size:.66rem; color:var(–silver); line-height:1.4; }
+.pv.acc { color:var(–lime); }
 
 /* ═══ STATS ═══ */
-.stats {
-display: flex;
-border: 1px solid var(–bdr);
-width: fit-content;
-}
-.stat {
-padding: 18px 28px;
-border-right: 1px solid var(–bdr);
-display: flex;
-flex-direction: column;
-gap: 5px;
-min-width: 100px;
-}
-.stat:last-child { border-right: none; }
-.snum {
-font-family: var(–f-sans);
-font-size: 2.2rem;
-font-weight: 800;
-letter-spacing: -2px;
-line-height: 1;
-}
-.snum.g { color: var(–lime); }
-.snum.b { color: var(–blue); }
-.snum.r { color: var(–red); }
-.slbl {
-font-family: var(–f-mono);
-font-size: .46rem;
-letter-spacing: 2px;
-text-transform: uppercase;
-color: var(–grey);
-}
+.stats { display:flex; border:1px solid var(–bdr); background:var(–card); }
+.stat { flex:1; padding:16px 20px; border-right:1px solid var(–bdr); text-align:center; }
+.stat:last-child{border-right:none}
+.snum { display:block; font-size:2rem; font-weight:800; letter-spacing:-2px; line-height:1; }
+.snum.g{color:var(–lime)} .snum.b{color:var(–blue)} .snum.r{color:var(–red)}
+.slbl { display:block; font-family:var(–mono); font-size:.42rem; letter-spacing:2px; text-transform:uppercase; color:var(–dim); margin-top:4px; }
 
 /* ═══ DIVIDER ═══ */
-.dw { padding: 0 48px; }
-.dv { height: 1px; background: var(–bdr); }
+.dw { padding:0 32px; }
+.dv { height:1px; background:var(–bdr); }
 
 /* ═══ SECTION ═══ */
-.sect { padding: 40px 48px 28px; }
-
+.sect { padding:36px 32px 24px; border-bottom:1px solid var(–bdr); }
 .slabel {
-font-family: var(–f-mono);
-font-size: .54rem;
-letter-spacing: 4px;
-text-transform: uppercase;
-color: var(–grey);
-margin-bottom: 20px;
-display: flex;
-align-items: center;
-gap: 12px;
+font-family:var(–mono); font-size:.5rem; letter-spacing:4px;
+text-transform:uppercase; color:var(–grey); margin-bottom:16px;
+display:flex; align-items:center; gap:10px;
 }
-.slabel::after { content:’’; flex:1; height:1px; background:var(–bdr); }
+.slabel::after{content:’’;flex:1;height:1px;background:var(–bdr)}
 
-/* ═══ CATEGORY BUTTONS ═══ */
+/* ═══ BUTTONS ═══ */
 .btns { display:flex; flex-wrap:wrap; gap:8px; }
-
 .cbtn {
-display: inline-flex;
-align-items: center;
-gap: 8px;
-padding: 11px 20px;
-background: var(–card);
-border: 1px solid var(–bdr);
-color: var(–silver);
-font-family: var(–f-sans);
-font-size: .8rem;
-font-weight: 600;
-cursor: pointer;
-white-space: nowrap;
-transition: all .18s ease;
--webkit-tap-highlight-color: transparent;
+display:inline-flex; align-items:center; gap:8px; padding:10px 18px;
+background:var(–card); border:1px solid var(–bdr); color:var(–silver);
+font-family:var(–sans); font-size:.78rem; font-weight:700;
+cursor:pointer; white-space:nowrap; letter-spacing:.2px;
+transition: all .18s ease; -webkit-tap-highlight-color:transparent;
+position:relative; overflow:hidden;
 }
-.cbtn:hover {
-border-color: rgba(204,255,0,.55);
-color: var(–lime);
-background: rgba(204,255,0,.06);
+.cbtn::after {
+content:’’; position:absolute; inset:0;
+background:var(–lime); transform:scaleX(0); transform-origin:left;
+transition:transform .18s ease; z-index:0;
 }
+.cbtn span { position:relative; z-index:1; }
+.cbtn:hover { border-color:rgba(200,255,0,.6); color:var(–lime); }
 .cbtn.on {
-background: var(–lime);
-color: #03030e;
-border-color: var(–lime);
-font-weight: 700;
-box-shadow: 0 0 24px rgba(204,255,0,.3);
+background:var(–lime); color:#050510; border-color:var(–lime);
+box-shadow:0 0 24px rgba(200,255,0,.3);
 }
-.ci { font-size: .95rem; }
+.cbtn.on:hover { color:#050510; }
 
 /* ═══ MAIN ═══ */
-main { padding: 0 48px 80px; }
+main { padding:0 32px 80px; }
 
-/* Empty state */
-.empty {
-border: 1px dashed var(–bdrhi);
-padding: 72px 40px;
-text-align: center;
-}
-.eico {
-font-size: 2.5rem;
-display: block;
-margin-bottom: 16px;
-animation: fl 4s ease-in-out infinite;
-}
-@keyframes fl { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-.etxt {
-font-family: var(–f-mono);
-font-size: .54rem;
-letter-spacing: 3px;
-text-transform: uppercase;
-color: var(–dim);
-line-height: 2.5;
-}
+.empty { padding:60px 20px; text-align:center; border:1px dashed var(–bdrhi); margin-top:24px; }
+.eico { font-size:2.5rem; display:block; margin-bottom:12px; animation:fl 4s ease-in-out infinite; }
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.etxt { font-family:var(–mono); font-size:.5rem; letter-spacing:3px; text-transform:uppercase; color:var(–dim); line-height:2.5; }
 
-/* Loader */
-.loader { display:none; padding:56px 0; text-align:center; }
+/* ═══ LOADER ═══ */
+.loader { display:none; padding:48px 0; text-align:center; }
 .loader.on { display:block; }
-.ltrack {
-width: 200px; height: 1px;
-background: var(–bdrhi);
-margin: 0 auto 20px;
-position: relative; overflow: hidden;
-}
-.ltrack::after {
-content: ‘’; position:absolute; left:-50%; top:0; width:50%; height:100%;
-background: linear-gradient(90deg, transparent, var(–lime), transparent);
-animation: scan .85s linear infinite;
-}
-@keyframes scan { 0%{left:-50%} 100%{left:110%} }
-.ltxt {
-font-family: var(–f-mono);
-font-size: .54rem;
-letter-spacing: 3px;
-text-transform: uppercase;
-color: var(–grey);
-animation: lp 2s ease-in-out infinite;
-}
-@keyframes lp { 0%,100%{opacity:1} 50%{opacity:.3} }
+.lbar { width:160px; height:2px; background:var(–bdr); margin:0 auto 16px; position:relative; overflow:hidden; }
+.lbar::after { content:’’; position:absolute; left:-40%; top:0; width:40%; height:100%;
+background:linear-gradient(90deg,transparent,var(–lime),transparent);
+animation:ls .8s linear infinite; }
+@keyframes ls{0%{left:-40%}100%{left:110%}}
+.ltxt { font-family:var(–mono); font-size:.5rem; letter-spacing:3px; text-transform:uppercase; color:var(–grey); }
 
-/* Results meta */
-.rmeta {
-display: none;
-padding: 28px 0 16px;
-border-bottom: 1px solid var(–bdr);
-margin-bottom: 16px;
-justify-content: space-between;
-align-items: flex-end;
-}
-.rmeta.on { display:flex; }
-.rcount {
-font-family: var(–f-sans);
-font-size: 3rem;
-font-weight: 800;
-letter-spacing: -3px;
-line-height: 1;
-color: var(–lime);
-}
-.rcount.pop { animation: pop .4s cubic-bezier(.22,1,.36,1); }
-@keyframes pop { 0%{transform:scale(.7);opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
-.rclbl {
-font-family: var(–f-mono);
-font-size: .5rem;
-letter-spacing: 3px;
-text-transform: uppercase;
-color: var(–grey);
-margin-top: 5px;
-}
-.rtime {
-font-family: var(–f-mono);
-font-size: .46rem;
-color: var(–dim);
-text-align: right;
-line-height: 2;
-white-space: pre;
-}
+/* ═══ RESULTS META ═══ */
+.rmeta { display:none; padding:24px 0 14px; border-bottom:1px solid var(–bdr); margin-bottom:16px;
+justify-content:space-between; align-items:flex-end; }
+.rmeta.on{display:flex}
+.rcount { font-size:3rem; font-weight:800; letter-spacing:-3px; line-height:1; color:var(–lime); }
+.rcount.pop { animation:pop .4s cubic-bezier(.22,1,.36,1); }
+@keyframes pop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.rclbl { font-family:var(–mono); font-size:.46rem; letter-spacing:3px; text-transform:uppercase; color:var(–grey); margin-top:4px; }
+.rtime { font-family:var(–mono); font-size:.42rem; color:var(–dim); text-align:right; line-height:1.9; white-space:pre; }
 
-/* AI bar */
-.aibar {
-display: none;
-margin-bottom: 20px;
-border-left: 3px solid var(–red);
-padding: 14px 20px;
-background: rgba(255,68,102,.06);
-}
-.aibar.on { display:flex; gap:16px; align-items:flex-start; }
-.ailbl {
-font-family: var(–f-mono);
-font-size: .44rem;
-letter-spacing: 2px;
-text-transform: uppercase;
-color: var(–red);
-white-space: nowrap;
-padding-top: 2px;
-flex-shrink: 0;
-}
-.aitxt {
-font-family: var(–f-mono);
-font-size: .7rem;
-line-height: 1.8;
-color: var(–silver);
-font-style: italic;
-}
+/* ═══ AI BAR ═══ */
+.aibar { display:none; margin-bottom:16px; border-left:3px solid var(–red); padding:12px 16px; background:rgba(255,68,85,.07); }
+.aibar.on { display:flex; gap:14px; align-items:flex-start; }
+.ailbl { font-family:var(–mono); font-size:.42rem; letter-spacing:2px; text-transform:uppercase; color:var(–red); white-space:nowrap; padding-top:2px; flex-shrink:0; }
+.aitxt { font-family:var(–mono); font-size:.65rem; line-height:1.8; color:var(–silver); font-style:italic; }
 
-/* Job grid */
-.grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-gap: 1px;
-background: var(–bdr);
-}
+/* ═══ JOB GRID ═══ */
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1px; background:var(–bdr); }
 
-/* Job card */
 .jcard {
-background: var(–card);
-padding: 24px;
-display: flex;
-flex-direction: column;
-gap: 12px;
-position: relative;
-overflow: hidden;
-opacity: 0;
-transform: translateY(14px);
-transition: opacity .35s ease, transform .35s ease, background .18s, box-shadow .22s;
+background:var(–card); padding:22px; display:flex; flex-direction:column; gap:12px;
+position:relative; overflow:hidden;
+opacity:0; transform:translateY(12px);
+transition:opacity .3s ease, transform .3s ease, background .18s, box-shadow .22s;
 }
-.jcard.in { opacity:1; transform:translateY(0); }
+.jcard.in{opacity:1;transform:translateY(0)}
 .jcard::before {
-content: ‘’; position:absolute; top:0; left:0; right:0; height:2px;
-background: var(–lime);
-transform: scaleX(0); transform-origin: left;
-transition: transform .28s ease;
+content:’’; position:absolute; top:0; left:0; right:0; height:2px;
+background:var(–lime); transform:scaleX(0); transform-origin:left; transition:transform .25s ease;
 }
-.jcard:hover { background: var(–cardhi); }
-.jcard:hover::before { transform: scaleX(1); }
-.jcard:hover .jsalary { background: rgba(204,255,0,.12); }
+.jcard:hover{background:var(–cardhi);box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.jcard:hover::before{transform:scaleX(1)}
+.jcard:hover .jsalary{background:rgba(200,255,0,.12)}
 
-.jtop {
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-gap: 8px;
-padding-bottom: 10px;
-border-bottom: 1px solid var(–bdr);
-}
-.jnum {
-font-family: var(–f-mono);
-font-size: .44rem;
-color: var(–dimmer);
-letter-spacing: 2px;
-padding-top: 2px;
-flex-shrink: 0;
-}
-.jtags { display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
-.tag {
-font-family: var(–f-mono);
-font-size: .42rem;
-letter-spacing: 1px;
-text-transform: uppercase;
-padding: 2px 6px;
-background: rgba(255,255,255,.03);
-color: var(–dim);
-border: 1px solid var(–bdr);
-}
-.tag.hi {
-background: rgba(204,255,0,.09);
-color: var(–lime);
-border-color: rgba(204,255,0,.3);
-}
+.jtop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding-bottom:10px;border-bottom:1px solid var(–bdr)}
+.jnum{font-family:var(–mono);font-size:.4rem;color:var(–dim);letter-spacing:2px;flex-shrink:0}
+.jtags{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.tag{font-family:var(–mono);font-size:.4rem;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;color:var(–dim);border:1px solid var(–bdr)}
+.tag.hi{color:var(–lime);border-color:rgba(200,255,0,.4);background:rgba(200,255,0,.07)}
 
-.jtitle {
-font-family: var(–f-sans);
-font-size: 1.05rem;
-font-weight: 700;
-letter-spacing: -.2px;
-line-height: 1.25;
-color: var(–white);
-min-height: 1.3em;
-}
-.jorg {
-font-family: var(–f-mono);
-font-size: .54rem;
-letter-spacing: 1px;
-text-transform: uppercase;
-color: var(–grey);
-min-height: 1em;
-}
-.jremark {
-font-family: var(–f-mono);
-font-size: .68rem;
-line-height: 1.75;
-color: #ff8899;
-font-style: italic;
-border-left: 2px solid rgba(255,68,102,.4);
-padding: 8px 12px;
-background: rgba(255,68,102,.07);
-min-height: 2em;
-}
-.jfoot {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding-top: 10px;
-border-top: 1px solid var(–bdr);
-margin-top: auto;
-}
-.jsrc {
-font-family: var(–f-mono);
-font-size: .42rem;
-color: var(–dim);
-letter-spacing: 1px;
-text-transform: uppercase;
-}
-.jsalary {
-font-family: var(–f-mono);
-font-size: .5rem;
-color: var(–lime);
-letter-spacing: 1px;
-padding: 3px 8px;
-border: 1px solid rgba(204,255,0,.3);
-background: rgba(204,255,0,.07);
-transition: background .2s;
-}
+.jtitle{font-size:1rem;font-weight:800;color:var(–white);line-height:1.25;min-height:1.25em}
+.jorg{font-family:var(–mono);font-size:.5rem;color:var(–grey);letter-spacing:1px;text-transform:uppercase;min-height:1em}
+.jremark{font-family:var(–mono);font-size:.62rem;line-height:1.75;color:#ff8899;font-style:italic;border-left:2px solid rgba(255,68,85,.5);padding:8px 12px;background:rgba(255,68,85,.07);min-height:1.75em}
+.jfoot{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(–bdr);margin-top:auto}
+.jsrc{font-family:var(–mono);font-size:.4rem;color:var(–dim);letter-spacing:1px;text-transform:uppercase}
+.jsalary{font-family:var(–mono);font-size:.48rem;color:var(–lime);letter-spacing:1px;padding:3px 8px;border:1px solid rgba(200,255,0,.4);background:rgba(200,255,0,.07);transition:background .2s}
 
 /* ═══ QUOTE BOX ═══ */
-.qbox {
-border: 1px solid var(–bdr);
-background: var(–card);
-margin-top: 40px;
-}
-.qbox-hdr {
-padding: 16px 24px;
-border-bottom: 1px solid var(–bdr);
-display: flex;
-justify-content: space-between;
-align-items: center;
-gap: 12px;
-flex-wrap: wrap;
-}
-.qbox-ttl {
-font-family: var(–f-mono);
-font-size: .52rem;
-letter-spacing: 4px;
-text-transform: uppercase;
-color: var(–grey);
-}
-.qnav { display:flex; gap:6px; align-items:center; }
-.qbtn {
-width: 30px; height: 30px;
-background: rgba(255,255,255,.04);
-border: 1px solid var(–bdr);
-color: var(–grey);
-cursor: pointer;
-font-size: 1rem;
-display: flex;
-align-items: center;
-justify-content: center;
-transition: all .15s;
--webkit-tap-highlight-color: transparent;
-}
-.qbtn:hover { border-color: var(–lime); color: var(–lime); }
-.qprog {
-font-family: var(–f-mono);
-font-size: .48rem;
-color: var(–dim);
-letter-spacing: 1px;
-min-width: 32px;
-text-align: center;
-}
+.qbox{border:1px solid var(–bdr);background:var(–card);margin-top:32px}
+.qbox-hdr{padding:14px 22px;border-bottom:1px solid var(–bdr);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.qbox-ttl{font-family:var(–mono);font-size:.5rem;letter-spacing:4px;text-transform:uppercase;color:var(–grey)}
+.qnav{display:flex;gap:6px;align-items:center}
+.qbtn{width:30px;height:30px;background:rgba(255,255,255,.04);border:1px solid var(–bdr);color:var(–grey);cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.qbtn:hover{border-color:var(–lime);color:var(–lime)}
+.qprog{font-family:var(–mono);font-size:.45rem;color:var(–dim);letter-spacing:1px;min-width:30px;text-align:center}
 
-.qbody {
-padding: 28px 28px 24px;
-min-height: 160px;
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-gap: 18px;
-transition: opacity .28s, transform .28s cubic-bezier(.22,1,.36,1);
-}
-.qbody.fade { opacity:0; transform:translateX(10px); }
+.qbody{padding:24px 22px 20px;min-height:150px;display:flex;flex-direction:column;gap:16px;transition:opacity .25s,transform .25s ease}
+.qbody.fade{opacity:0;transform:translateX(8px)}
 
-.qquote {
-font-family: var(–f-sans);
-font-size: .95rem;
-line-height: 1.75;
-color: var(–silver);
-font-style: italic;
-position: relative;
-padding-left: 20px;
-}
-.qquote::before {
-content: ‘”’;
-position: absolute; left: 0; top: -6px;
-font-size: 2.2rem;
-color: var(–lime);
-line-height: 1;
-font-style: normal;
-}
+.qquote{font-size:.9rem;line-height:1.75;color:var(–silver);font-style:italic;position:relative;padding-left:18px}
+.qquote::before{content:’”’;position:absolute;left:0;top:-4px;font-size:2rem;color:var(–lime);line-height:1;font-style:normal}
 
-.qmeta { display:flex; align-items:center; gap:14px; }
-.qava {
-width: 36px; height: 36px;
-border-radius: 50%;
-background: var(–bdrhi);
-border: 1px solid var(–bdr);
-display: flex;
-align-items: center;
-justify-content: center;
-font-family: var(–f-mono);
-font-size: .6rem;
-color: var(–lime);
-font-weight: 700;
-flex-shrink: 0;
-}
-.qname {
-font-family: var(–f-mono);
-font-size: .52rem;
-letter-spacing: 2px;
-text-transform: uppercase;
-color: var(–white);
-}
-.qrole {
-font-family: var(–f-mono);
-font-size: .44rem;
-color: var(–grey);
-margin-top: 2px;
-}
-.qdots {
-display: flex;
-gap: 5px;
-align-items: center;
-padding: 12px 24px;
-border-top: 1px solid var(–bdr);
-}
-.qdot {
-width: 5px; height: 5px;
-border-radius: 50%;
-background: var(–bdrhi);
-cursor: pointer;
-transition: all .22s;
-}
-.qdot.on { background: var(–lime); width: 14px; border-radius: 3px; }
+.qmeta{display:flex;align-items:center;gap:12px}
+.qava{width:34px;height:34px;border-radius:50%;background:var(–bg);border:1px solid var(–bdr);display:flex;align-items:center;justify-content:center;font-family:var(–mono);font-size:.55rem;color:var(–lime);font-weight:700;flex-shrink:0}
+.qname{font-family:var(–mono);font-size:.5rem;letter-spacing:2px;text-transform:uppercase;color:var(–white)}
+.qrole{font-family:var(–mono);font-size:.42rem;color:var(–grey);margin-top:2px}
+.qdots{display:flex;gap:5px;padding:12px 22px;border-top:1px solid var(–bdr)}
+.qdot{width:5px;height:5px;border-radius:50%;background:var(–bdrhi);cursor:pointer;transition:all .22s}
+.qdot.on{background:var(–lime);width:14px;border-radius:3px}
 
 /* ═══ PORTAL BOX ═══ */
-.pbox {
-border: 1px solid var(–bdr);
-background: var(–card);
-margin-top: 40px;
-}
-.pbox-hdr {
-width: 100%;
-padding: 16px 24px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-gap: 12px;
-background: none;
-border: none;
-border-bottom: 1px solid transparent;
-cursor: pointer;
-color: inherit;
-text-align: left;
-transition: background .15s, border-color .25s;
--webkit-tap-highlight-color: transparent;
-}
-.pbox-hdr:hover { background: rgba(255,255,255,.02); }
-.pbox-hdr[aria-expanded=“true”] { border-bottom-color: var(–bdr); }
+.pbox{border:1px solid var(–bdr);background:var(–card);margin-top:32px}
+.pbox-btn{width:100%;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;background:none;border:none;border-bottom:1px solid transparent;cursor:pointer;color:inherit;text-align:left;transition:background .15s,border-color .2s;-webkit-tap-highlight-color:transparent}
+.pbox-btn:hover{background:rgba(255,255,255,.02)}
+.pbox-btn[aria-expanded=“true”]{border-bottom-color:var(–bdr)}
+.pbox-left{display:flex;align-items:center;gap:10px}
+.pbox-ttl{font-family:var(–mono);font-size:.5rem;letter-spacing:4px;text-transform:uppercase;color:var(–grey)}
+.pbox-cnt{font-family:var(–mono);font-size:.42rem;letter-spacing:2px;color:var(–lime);padding:2px 8px;border:1px solid rgba(200,255,0,.35);background:rgba(200,255,0,.07)}
+.pbox-right{display:flex;align-items:center;gap:8px}
+.pfils{display:none;gap:5px;flex-wrap:wrap}
+.pfils.open{display:flex}
+.pfil{font-family:var(–mono);font-size:.44rem;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;background:transparent;border:1px solid var(–bdr);color:var(–grey);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.pfil:hover{border-color:var(–lime);color:var(–lime)}
+.pfil.on{background:rgba(200,255,0,.1);border-color:rgba(200,255,0,.5);color:var(–lime)}
+.parrow{font-family:var(–mono);font-size:.6rem;color:var(–grey);transition:transform .3s ease;flex-shrink:0}
+.pbox-btn[aria-expanded=“true”] .parrow{transform:rotate(180deg)}
 
-.pbox-hdr-left { display:flex; align-items:center; gap:12px; }
-.pbox-ttl {
-font-family: var(–f-mono);
-font-size: .52rem;
-letter-spacing: 4px;
-text-transform: uppercase;
-color: var(–grey);
-}
-.pbox-count {
-font-family: var(–f-mono);
-font-size: .44rem;
-letter-spacing: 2px;
-text-transform: uppercase;
-color: var(–lime);
-padding: 2px 8px;
-border: 1px solid rgba(204,255,0,.3);
-background: rgba(204,255,0,.07);
-}
-.pbox-hdr-right { display:flex; align-items:center; gap:10px; }
-.pfils {
-display: none;
-gap: 5px;
-flex-wrap: wrap;
-}
-.pfils.open { display:flex; }
-.pfil {
-font-family: var(–f-mono);
-font-size: .46rem;
-letter-spacing: 1px;
-text-transform: uppercase;
-padding: 4px 11px;
-background: transparent;
-border: 1px solid var(–bdr);
-color: var(–grey);
-cursor: pointer;
-transition: all .15s;
--webkit-tap-highlight-color: transparent;
-}
-.pfil:hover { border-color: rgba(204,255,0,.45); color: var(–lime); }
-.pfil.on { background: rgba(204,255,0,.1); border-color: rgba(204,255,0,.45); color: var(–lime); }
+.pgrid-wrap{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1)}
+.pgrid-wrap.open{max-height:2400px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(–bdr)}
 
-.parrow-icon {
-font-family: var(–f-mono);
-font-size: .65rem;
-color: var(–grey);
-transition: transform .3s cubic-bezier(.22,1,.36,1);
-flex-shrink: 0;
-user-select: none;
-}
-.pbox-hdr[aria-expanded=“true”] .parrow-icon { transform: rotate(180deg); }
-
-.pgrid-wrap {
-max-height: 0;
-overflow: hidden;
-transition: max-height .5s cubic-bezier(.22,1,.36,1);
-}
-.pgrid-wrap.open { max-height: 2400px; }
-
-.pgrid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-gap: 1px;
-background: var(–bdr);
-}
-
-.plink {
-display: flex;
-flex-direction: column;
-gap: 8px;
-padding: 18px 20px;
-background: var(–card);
-text-decoration: none;
-transition: background .18s;
--webkit-tap-highlight-color: transparent;
-}
-.plink:hover { background: var(–cardhi); }
-.plink:hover .pl-arrow { transform: translateX(4px); }
-
-.pltop { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-.plname {
-font-family: var(–f-sans);
-font-size: .88rem;
-font-weight: 700;
-color: var(–white);
-}
-.pltag {
-font-family: var(–f-mono);
-font-size: .41rem;
-letter-spacing: 1px;
-text-transform: uppercase;
-padding: 2px 7px;
-background: rgba(204,255,0,.08);
-color: var(–lime);
-border: 1px solid rgba(204,255,0,.25);
-white-space: nowrap;
-flex-shrink: 0;
-}
-.pldesc {
-font-family: var(–f-mono);
-font-size: .52rem;
-color: var(–grey);
-line-height: 1.6;
-}
-.plfoot { display:flex; justify-content:space-between; align-items:center; margin-top:2px; }
-.plurl { font-family: var(–f-mono); font-size: .42rem; color: var(–dim); }
-.pl-arrow {
-font-family: var(–f-mono);
-font-size: .6rem;
-color: var(–lime);
-transition: transform .2s ease;
-}
+.plink{display:flex;flex-direction:column;gap:7px;padding:16px 18px;background:var(–card);text-decoration:none;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.plink:hover{background:var(–cardhi)}
+.plink:hover .pl-arr{transform:translateX(4px)}
+.pltop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.plname{font-size:.88rem;font-weight:800;color:var(–white)}
+.pltag{font-family:var(–mono);font-size:.4rem;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;background:rgba(200,255,0,.08);color:var(–lime);border:1px solid rgba(200,255,0,.25);white-space:nowrap;flex-shrink:0}
+.pldesc{font-family:var(–mono);font-size:.5rem;color:var(–grey);line-height:1.6}
+.plfoot{display:flex;justify-content:space-between;align-items:center}
+.plurl{font-family:var(–mono);font-size:.4rem;color:var(–dim)}
+.pl-arr{font-family:var(–mono);font-size:.6rem;color:var(–lime);transition:transform .15s ease}
 
 /* ═══ FOOTER ═══ */
-footer {
-padding: 22px 48px;
-border-top: 1px solid var(–bdr);
-display: flex;
-justify-content: space-between;
-align-items: center;
-flex-wrap: wrap;
-gap: 12px;
-position: relative;
-z-index: 2;
-}
-.fl {
-font-family: var(–f-mono);
-font-size: .46rem;
-color: var(–dim);
-letter-spacing: 1px;
-line-height: 2;
-}
-.fr {
-font-family: var(–f-mono);
-font-size: .4rem;
-color: var(–dim);
-text-align: right;
-line-height: 2;
-opacity: .5;
-}
+footer{padding:20px 32px;border-top:1px solid var(–bdr);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:48px}
+.fl{font-family:var(–mono);font-size:.44rem;color:var(–dim);letter-spacing:1px;line-height:2}
+.fr{font-family:var(–mono);font-size:.38rem;color:var(–dim);text-align:right;line-height:2;opacity:.6}
 
 /* ═══ RESPONSIVE ═══ */
-@media (max-width: 768px) {
-header, .hero, .dw, .sect, main, footer { padding-left: 20px; padding-right: 20px; }
-.dw { padding: 0 20px; }
-.htitle { font-size: clamp(2.5rem, 10vw, 3.5rem); letter-spacing: -1.5px; }
-.htitle .l3 { font-size: .4em; }
-.profile { grid-template-columns: 1fr 1fr; }
-.stats { flex-direction: column; border: none; width: 100%; }
-.stat { border-right: none; border-bottom: 1px solid var(–bdr); padding: 12px 0; }
-.stat:last-child { border-bottom: none; }
-.grid { grid-template-columns: 1fr; }
-.pgrid { grid-template-columns: 1fr; }
-.qbox-hdr { flex-direction: column; align-items: flex-start; }
-.pbox-hdr { flex-wrap: wrap; gap:8px; }
-.pbox-hdr-right { width: 100%; justify-content: space-between; }
-}
-
-@media (max-width: 480px) {
-.htitle { font-size: 2.4rem; letter-spacing: -1px; }
-.profile { grid-template-columns: 1fr 1fr; gap: 14px 12px; }
-.cbtn { font-size: .72rem; padding: 10px 14px; }
+@media(max-width:640px){
+header,.hero,.dw,.sect,main,footer{padding-left:16px;padding-right:16px}
+.dw{padding:0 16px}
+.htitle{font-size:2.8rem;letter-spacing:-1.5px}
+.profile{grid-template-columns:1fr 1fr}
+.pi:nth-child(3n){border-right:1px solid var(–bdr)}
+.pi:nth-child(2n){border-right:none}
+.grid{grid-template-columns:1fr}
+.pgrid{grid-template-columns:1fr}
+.stats{flex-direction:column}
+.stat{border-right:none;border-bottom:1px solid var(–bdr);text-align:left}
+.stat:last-child{border-bottom:none}
+.qbox-hdr{flex-direction:column;align-items:flex-start}
+.pbox-btn{flex-wrap:wrap}
+.pbox-right{width:100%;justify-content:space-between}
+.blob{filter:blur(60px)}
 }
 </style>
 
 </head>
 <body>
 
-<canvas id="bgc"></canvas>
+<!-- CSS ANIMATED BACKGROUND -->
 
-<div id="grain"></div>
+<div class="bg-wrap">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+  <div class="blob b5"></div>
+</div>
+<div class="scanlines"></div>
+
 <div id="bar"></div>
 
-<!-- ═══ HEADER ═══ -->
+<!-- HEADER -->
 
 <header>
   <div>
     <div class="logo">jens<em>.jobs</em></div>
-    <div class="live" style="margin-top:6px">
-      <div class="dot"></div>
-      Täglich aktuell · ob er will oder nicht
-    </div>
+    <div class="live" style="margin-top:5px"><div class="dot"></div>Täglich · ob er will oder nicht</div>
   </div>
   <div class="hright">
     <div class="hdate" id="hdate">—</div>
-    <div style="font-family:var(--f-mono);font-size:.42rem;color:var(--dim);letter-spacing:2px">BASEL · CH</div>
+    <div style="font-family:var(--mono);font-size:.42rem;color:var(--dim);letter-spacing:2px">BASEL · CH</div>
   </div>
 </header>
 
-<!-- ═══ HERO ═══ -->
+<!-- HERO -->
 
 <div class="hero">
-  <span class="eyebrow rv">Ungebetene Karriereberatung seit 2026</span>
-
-  <h1 class="htitle rv d1">
+  <span class="eyebrow">Ungebetene Karriereberatung seit 2026</span>
+  <h1 class="htitle">
     <span class="l1">Jens sucht.</span>
     <span class="l2">Wir helfen.</span>
     <span class="l3">Ob er will oder nicht.</span>
   </h1>
-
-  <div class="profile rv d2">
-    <div class="pi">
-      <div class="pk">Funktion</div>
-      <div class="pv acc">Dr. Verwaltungsleiter</div>
-    </div>
-    <div class="pi">
-      <div class="pk">Arbeitgeber</div>
-      <div class="pv">Gemeindeverwaltung Riehen</div>
-    </div>
-    <div class="pi">
-      <div class="pk">Im Amt seit</div>
-      <div class="pv">1. Juli 2016 <span style="color:var(--grey)">(bald 10 J.)</span></div>
-    </div>
-    <div class="pi">
-      <div class="pk">Mitarbeitende</div>
-      <div class="pv">~700 inkl. Schulen</div>
-    </div>
-    <div class="pi">
-      <div class="pk">Ausbildung</div>
-      <div class="pv">Prom. Jurist + NDS BWL</div>
-    </div>
-    <div class="pi">
-      <div class="pk">Hobbys</div>
-      <div class="pv">Ski · Rennvelo · Fasnacht</div>
-    </div>
+  <div class="profile">
+    <div class="pi"><div class="pk">Funktion</div><div class="pv acc">Dr. Verwaltungsleiter</div></div>
+    <div class="pi"><div class="pk">Arbeitgeber</div><div class="pv">GV Riehen</div></div>
+    <div class="pi"><div class="pk">Im Amt seit</div><div class="pv">1. Juli 2016</div></div>
+    <div class="pi"><div class="pk">Mitarbeitende</div><div class="pv">~700</div></div>
+    <div class="pi"><div class="pk">Ausbildung</div><div class="pv">Jurist + NDS BWL</div></div>
+    <div class="pi"><div class="pk">Hobbys</div><div class="pv">Ski · Velo · Fasnacht</div></div>
   </div>
-
-  <div class="stats rv d3">
-    <div class="stat">
-      <div class="snum g" id="sc">0</div>
-      <div class="slbl">Suchen heute</div>
-    </div>
-    <div class="stat">
-      <div class="snum b">∞</div>
-      <div class="slbl">Ausreden von Jens</div>
-    </div>
-    <div class="stat">
-      <div class="snum r">1</div>
-      <div class="slbl">Job den er braucht</div>
-    </div>
+  <div class="stats">
+    <div class="stat"><span class="snum g" id="sc">0</span><span class="slbl">Suchen heute</span></div>
+    <div class="stat"><span class="snum b">∞</span><span class="slbl">Ausreden</span></div>
+    <div class="stat"><span class="snum r">1</span><span class="slbl">Job den er braucht</span></div>
   </div>
 </div>
 
 <div class="dw"><div class="dv"></div></div>
 
-<!-- ═══ CATEGORIES ═══ -->
+<!-- CATEGORIES -->
 
 <div class="sect">
-  <div class="slabel rv">Was suchen wir für Jens heute?</div>
-  <div class="btns rv d1">
-    <button class="cbtn" onclick="doSearch(this,'verwaltung')"><span class="ci">🏛️</span> Noch mehr Verwaltung</button>
-    <button class="cbtn" onclick="doSearch(this,'privatwirtschaft')"><span class="ci">💼</span> Privatwirtschaft</button>
-    <button class="cbtn" onclick="doSearch(this,'fuehrung')"><span class="ci">🎯</span> Grosse Chefrolle</button>
-    <button class="cbtn" onclick="doSearch(this,'sinnstiftend')"><span class="ci">🌱</span> Sinnstiftendes</button>
-    <button class="cbtn" onclick="doSearch(this,'akademisch')"><span class="ci">🎓</span> Uni Basel</button>
-    <button class="cbtn" onclick="doSearch(this,'wildcard')"><span class="ci">🎲</span> Überrasch mich</button>
+  <div class="slabel">Was suchen wir für Jens?</div>
+  <div class="btns">
+    <button class="cbtn" onclick="go(this,'verwaltung')"><span>🏛️ Noch mehr Verwaltung</span></button>
+    <button class="cbtn" onclick="go(this,'privat')"><span>💼 Privatwirtschaft</span></button>
+    <button class="cbtn" onclick="go(this,'fuehrung')"><span>🎯 Grosse Chefrolle</span></button>
+    <button class="cbtn" onclick="go(this,'sinn')"><span>🌱 Sinnstiftendes</span></button>
+    <button class="cbtn" onclick="go(this,'uni')"><span>🎓 Uni Basel</span></button>
+    <button class="cbtn" onclick="go(this,'wild')"><span>🎲 Überrasch mich</span></button>
   </div>
 </div>
 
-<!-- ═══ RESULTS ═══ -->
+<!-- RESULTS -->
 
 <main>
-
   <div class="empty" id="empty">
     <span class="eico">👆</span>
-    <div class="etxt">Kategorie wählen<br>System wartet auf Eingabe</div>
+    <div class="etxt">Kategorie wählen<br>dann erscheinen die Stellen</div>
   </div>
-
-  <div class="loader" id="loader">
-    <div class="ltrack"></div>
-    <div class="ltxt" id="ltxt">Initialisiere…</div>
-  </div>
-
+  <div class="loader" id="loader"><div class="lbar"></div><div class="ltxt" id="ltxt">Suche läuft…</div></div>
   <div class="rmeta" id="rmeta">
-    <div>
-      <div class="rcount" id="rcount">0</div>
-      <div class="rclbl" id="rclbl">Stellen</div>
-    </div>
+    <div><div class="rcount" id="rcount">0</div><div class="rclbl" id="rclbl">Stellen</div></div>
     <div class="rtime" id="rtime"></div>
   </div>
-
-  <div class="aibar" id="aibar">
-    <div class="ailbl">Amtl. Urteil</div>
-    <div class="aitxt" id="aitxt"></div>
-  </div>
-
+  <div class="aibar" id="aibar"><div class="ailbl">Amtl. Urteil</div><div class="aitxt" id="aitxt"></div></div>
   <div class="grid" id="grid"></div>
 
   <!-- QUOTE BOX -->
 
-  <div class="qbox rv" id="qbox" style="display:none">
+  <div class="qbox" id="qbox" style="display:none">
     <div class="qbox-hdr">
       <div class="qbox-ttl">Was seine Mitarbeitenden sagen</div>
       <div class="qnav">
         <button class="qbtn" onclick="qmove(-1)">‹</button>
-        <div class="qprog"><span id="qci">1</span>&thinsp;/&thinsp;<span id="qct">6</span></div>
+        <div class="qprog" id="qprog">1 / 6</div>
         <button class="qbtn" onclick="qmove(1)">›</button>
       </div>
     </div>
@@ -944,10 +504,7 @@ header, .hero, .dw, .sect, main, footer { padding-left: 20px; padding-right: 20p
       <div class="qquote" id="qq"></div>
       <div class="qmeta">
         <div class="qava" id="qava"></div>
-        <div>
-          <div class="qname" id="qn"></div>
-          <div class="qrole" id="qr"></div>
-        </div>
+        <div><div class="qname" id="qn"></div><div class="qrole" id="qr"></div></div>
       </div>
     </div>
     <div class="qdots" id="qdots"></div>
@@ -955,401 +512,228 @@ header, .hero, .dw, .sect, main, footer { padding-left: 20px; padding-right: 20p
 
   <!-- PORTAL BOX -->
 
-  <div class="pbox rv" id="pbox">
-    <button class="pbox-hdr" id="pbox-hdr" onclick="togglePbox()" aria-expanded="false">
-      <div class="pbox-hdr-left">
-        <div class="pbox-ttl">Direkt auf Jobsuche — für den Mutigen</div>
-        <div class="pbox-count">12 Portale</div>
+  <div class="pbox">
+    <button class="pbox-btn" id="pbtn" onclick="toggleP()" aria-expanded="false">
+      <div class="pbox-left">
+        <div class="pbox-ttl">Direkt auf Jobsuche</div>
+        <div class="pbox-cnt">12 Portale</div>
       </div>
-      <div class="pbox-hdr-right">
+      <div class="pbox-right">
         <div class="pfils" id="pfils" onclick="event.stopPropagation()">
-          <button class="pfil on" onclick="fprt(this,'alle')">Alle</button>
-          <button class="pfil" onclick="fprt(this,'kader')">Kader</button>
-          <button class="pfil" onclick="fprt(this,'oeffentlich')">Öffentlich</button>
-          <button class="pfil" onclick="fprt(this,'akademisch')">Akademisch</button>
-          <button class="pfil" onclick="fprt(this,'management')">Management</button>
+          <button class="pfil on" onclick="fp(this,'alle')">Alle</button>
+          <button class="pfil" onclick="fp(this,'kader')">Kader</button>
+          <button class="pfil" onclick="fp(this,'pub')">Öffentlich</button>
+          <button class="pfil" onclick="fp(this,'aka')">Akademisch</button>
+          <button class="pfil" onclick="fp(this,'mgmt')">Management</button>
         </div>
-        <div class="parrow-icon">▼</div>
+        <div class="parrow">▼</div>
       </div>
     </button>
     <div class="pgrid-wrap" id="pgrid-wrap">
       <div class="pgrid" id="pgrid"></div>
     </div>
   </div>
-
 </main>
 
-<div class="dw" style="margin-top:48px"><div class="dv"></div></div>
-
 <footer>
-  <div class="fl">jens.jobs · Basel · 30km · jobs.ch · managementstellen.ch · jobscout24.ch · unibas.ch · bs.ch</div>
+  <div class="fl">jens.jobs · Basel 30km · jobs.ch · managementstellen.ch · jobscout24.ch · unibas.ch</div>
   <div class="fr">another stupid redhippo© project.<br>nobody asked for.<br>built with insomnia.</div>
 </footer>
 
 <script>
-/* ═══ BLOB BACKGROUND ═══ */
-(function(){
-  const c = document.getElementById('bgc');
-  const ctx = c.getContext('2d');
-  let W, H;
-  const B = [
-    {x:.15,y:.20,r:.35,vx:.00009,vy:.00007,h:240,s:70,l:18},
-    {x:.82,y:.12,r:.28,vx:-.00007,vy:.00010,h:250,s:60,l:14},
-    {x:.50,y:.65,r:.38,vx:.00006,vy:-.00008,h:230,s:75,l:20},
-    {x:.88,y:.75,r:.22,vx:-.00010,vy:-.00006,h:260,s:65,l:12},
-    {x:.22,y:.88,r:.26,vx:.00008,vy:-.00010,h:245,s:55,l:11},
-    {x:.62,y:.38,r:.20,vx:-.00006,vy:.00012,h:235,s:80,l:16},
-  ];
-  function resize(){ W = c.width = innerWidth; H = c.height = innerHeight; }
-  function draw(){
-    ctx.fillStyle = '#03030e'; ctx.fillRect(0,0,W,H);
-    for(const b of B){
-      b.x += b.vx; b.y += b.vy;
-      if(b.x < -.2 || b.x > 1.2) b.vx *= -1;
-      if(b.y < -.2 || b.y > 1.2) b.vy *= -1;
-      const cx=b.x*W, cy=b.y*H, r=b.r*Math.max(W,H);
-      const g = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
-      g.addColorStop(0,   `hsla(${b.h},${b.s}%,${b.l}%,1)`);
-      g.addColorStop(.45, `hsla(${b.h},${b.s}%,${b.l*.6}%,.55)`);
-      g.addColorStop(1,   `hsla(${b.h},${b.s}%,0%,0)`);
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-      ctx.fillStyle = g; ctx.fill();
-    }
-    ctx.fillStyle = 'rgba(0,0,0,.05)';
-    for(let y=0; y<H; y+=4) ctx.fillRect(0,y,W,1);
-    requestAnimationFrame(draw);
+/* SCROLL BAR */
+window.addEventListener('scroll',()=>{
+  document.getElementById('bar').style.width=(scrollY/(document.body.scrollHeight-innerHeight)*100)+'%';
+},{passive:true});
+
+/* DATE */
+document.getElementById('hdate').textContent=
+  new Date().toLocaleDateString('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+
+/* COUNTER */
+let sc=parseInt(sessionStorage.getItem('jc')||'0');
+document.getElementById('sc').textContent=sc;
+
+function countUp(el,to){
+  const from=parseInt(el.textContent)||0,t0=performance.now();
+  function f(now){
+    const p=Math.min((now-t0)/600,1);
+    el.textContent=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));
+    p<1?requestAnimationFrame(f):(el.textContent=to);
   }
-  window.addEventListener('resize', resize);
-  resize(); draw();
-})();
+  requestAnimationFrame(f);
+}
 
-/* ═══ SCROLL PROGRESS BAR ═══ */
-window.addEventListener('scroll', () => {
-  const pct = scrollY / (document.body.scrollHeight - innerHeight) * 100;
-  document.getElementById('bar').style.width = pct + '%';
-}, { passive: true });
-
-/* ═══ REVEAL ON SCROLL ═══ */
-(function(){
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if(e.isIntersecting){
-        e.target.classList.add('visible');
-        obs.unobserve(e.target);
-      }
-    });
-  }, { threshold: .06, rootMargin: '0px 0px -20px 0px' });
-
-  document.querySelectorAll('.rv').forEach(el => {
-    const rect = el.getBoundingClientRect();
-    if(rect.top < innerHeight * .98){
-      el.classList.add('visible');
-    } else {
-      el.classList.add('will-animate');
-      obs.observe(el);
-    }
-  });
-})();
-
-/* ═══ TYPEWRITER ═══ */
-function tw(el, text, speed, cb){
-  el.textContent = ''; let i = 0;
-  const iv = setInterval(() => {
-    if(i >= text.length){ clearInterval(iv); if(cb) cb(); return; }
-    el.textContent += text[i++];
-  }, speed + (Math.random() < .06 ? 70 : 0));
+/* TYPEWRITER */
+function tw(el,text,spd,cb){
+  el.textContent='';let i=0;
+  const iv=setInterval(()=>{
+    if(i>=text.length){clearInterval(iv);cb&&cb();return;}
+    el.textContent+=text[i++];
+  },spd+(Math.random()<.06?60:0));
   return iv;
 }
 
-/* ═══ ANIMATED COUNTER ═══ */
-function countUp(el, to){
-  const from = parseInt(el.textContent) || 0;
-  const t0 = performance.now();
-  function step(now){
-    const p = Math.min((now - t0) / 600, 1);
-    el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1-p, 3)));
-    if(p < 1) requestAnimationFrame(step);
-    else el.textContent = to;
-  }
-  requestAnimationFrame(step);
-}
-
-/* ═══ INIT ═══ */
-document.getElementById('hdate').textContent =
-  new Date().toLocaleDateString('de-CH', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
-
-let sc = parseInt(sessionStorage.getItem('jc') || '0');
-document.getElementById('sc').textContent = sc;
-
-/* ═══ JOB DATA ═══ */
-const DATA = {
-  verwaltung: {
-    c: "Das Amt freut sich, Herrn Dr. van der Meer mitteilen zu dürfen, dass seine bisherigen Leistungen als solide bezeichnet werden können — im Sinne von: er hat nie etwas Bemerkenswertes getan. Die folgenden Stellen bieten die Möglichkeit, dieses Kunststück zu wiederholen, jedoch mit höherem Titel.",
-    j: [
-      {t:"Abteilungsleiter Einwohnerdienste",o:"Gemeinde Muttenz",l:"Muttenz BL",s:"gemeinde-muttenz.ch",r:"Identische Stelle, anderes Dorf — Jens würde es nach zwei Wochen nicht merken.",p:"CHF 110–125k",g:["100%","Verwaltung","Führung"]},
-      {t:"Stv. Gemeindeschreiber",o:"Gemeinde Binningen",l:"Binningen BL",s:"binningen.ch",r:"Stellvertreter: genug Verantwortung um wichtig zu wirken, zu wenig um Fehler zu machen.",p:"CHF 105–118k",g:["Kader","100%","Öffentlich"]},
-      {t:"Leiterin Stadtentwicklung",o:"Stadt Liestal",l:"Liestal BL",s:"liestal.ch",r:"Stadtentwicklung einer Stadt die sich seit 1972 nicht entwickelt hat.",p:"CHF 115–130k",g:["Leitung","Kader","Kanton"]},
-      {t:"Bereichsleiter Soziales & Integration",o:"Kanton Basel-Landschaft",l:"Liestal BL",s:"baselland.ch",r:"Mehr Bürokratie, mehr Budget, mehr Sitzungen — Jens in seinem natürlichen Habitat.",p:"CHF 120–140k",g:["Kanton","Soziales","Führung"]},
-      {t:"Generalsekretär Gemeindeverband",o:"Verband Baselbieter Gemeinden",l:"Aesch BL",s:"vbg-bl.ch",r:"Chef aller Gemeinden — der logische nächste Schritt nach 'einer Gemeinde'.",p:"CHF 130–150k",g:["CEO","Verband","100%"]},
-    ]
-  },
-  privatwirtschaft: {
-    c: "Das Amt vermerkt mit verhaltener Begeisterung, dass der promovierte Jurist die öffentliche Hand verlassen möchte. Die Privatwirtschaft wurde über seine Ankunft noch nicht informiert.",
-    j: [
-      {t:"Head of Corporate Affairs",o:"Novartis AG",l:"Basel",s:"novartis.com/jobs",r:"Jens verbringt die erste Woche damit, das Organigramm zu verstehen.",p:"CHF 160–200k",g:["Pharma","Kader","Englisch"]},
-      {t:"Leiter Public Affairs Schweiz",o:"Roche Holding AG",l:"Basel",s:"roche.com/careers",r:"Behördensprache als Beruf — Dr. van der Meer ist qualified by accident.",p:"CHF 150–185k",g:["Roche","Führung","Politik"]},
-      {t:"Geschäftsführer Region Nord",o:"Helvetia Versicherungen",l:"Basel",s:"helvetia.ch/jobs",r:"Versicherungen verkaufen sich ähnlich wie Gemeindeprospekte — Jens muss nur lächeln.",p:"CHF 140–170k",g:["Versicherung","GF","Vertrieb"]},
-      {t:"Managing Director Schweiz",o:"BKW Energie AG",l:"Basel Region",s:"bkw.ch/careers",r:"Energie — nicht die Art die Jens nach dem Mittagessen ausstrahlt.",p:"CHF 155–190k",g:["Energie","MD","100%"]},
-      {t:"Direktor Facility Management",o:"Swiss Prime Site",l:"Basel",s:"sps.swiss/jobs",r:"Gebäude verwalten statt Menschen — eine deutliche Qualitätssteigerung.",p:"CHF 135–160k",g:["Immobilien","Direktion","FM"]},
-    ]
-  },
-  fuehrung: {
-    c: "Das Amt registriert den Wunsch nach einer Führungsposition mit leiser Skepsis. Herr Dr. van der Meer leitet bereits 700 Mitarbeitende. Mehr war offenbar nicht genug.",
-    j: [
-      {t:"CEO",o:"IWB — Industrielle Werke Basel",l:"Basel",s:"iwb.ch/jobs",r:"Wasserversorgung, Strom, Gas für ganz Basel — was könnte schon schiefgehen.",p:"CHF 250–320k",g:["CEO","Stadtwerk","VR"]},
-      {t:"Stadtpräsident ad interim",o:"Stadt Laufen",l:"Laufen BL",s:"laufen.ch",r:"Chef einer ganzen Stadt — zugegeben, es ist Laufen, aber immerhin.",p:"CHF 145–165k",g:["CEO","Stadt","Politik"]},
-      {t:"Generaldirektor",o:"Kantonsspital Baselland",l:"Bruderholz BL",s:"ksbl.ch/jobs",r:"Ein Spital leiten ohne Medizinstudium — in der Schweiz durchaus möglich.",p:"CHF 280–350k",g:["GD","Spital","Kader"]},
-      {t:"Direktor Messe Basel",o:"MCH Group AG",l:"Basel",s:"mch-group.com",r:"Art Basel, Uhren & Schmuck — als Fasnächtler fühlt sich Jens sofort wohl.",p:"CHF 230–290k",g:["Direktor","Events","International"]},
-      {t:"CEO",o:"Basler Verkehrs-Betriebe (BVB)",l:"Basel",s:"bvb.ch/karriere",r:"Trams leiten ist wie Verwaltung, nur wütend wenn es zu spät kommt.",p:"CHF 240–300k",g:["CEO","Öffentlich","Tram"]},
-    ]
-  },
-  sinnstiftend: {
-    c: "Das Amt begrüsst den Wunsch nach sinnstiftender Tätigkeit. Als Vater von drei Kindern versteht Dr. van der Meer Gemeinschaft. Die Frage ist ob die Gemeinschaft das auch weiss.",
-    j: [
-      {t:"Geschäftsführer",o:"Pro Infirmis Basel",l:"Basel",s:"proinfirmis.ch/jobs",r:"Menschen helfen statt Formulare abzeichnen — ein radikaler Karriereschritt.",p:"CHF 115–135k",g:["NGO","GF","Soziales"]},
-      {t:"Direktor",o:"Swiss Tropical & Public Health Institute",l:"Basel",s:"swisstph.ch/jobs",r:"Tropenmedizin ohne Tropen — typisch Basel.",p:"CHF 130–155k",g:["Institut","Global","Direktor"]},
-      {t:"Stiftungsleitung",o:"Christoph Merian Stiftung",l:"Basel",s:"cms-basel.ch",r:"Eine der reichsten Stiftungen der Schweiz leiten — der Sinn ist inklusive.",p:"CHF 140–170k",g:["Stiftung","Leitung","Kultur"]},
-      {t:"Generalsekretär",o:"SRK Kantonalverband Basel",l:"Basel",s:"srk-bs.ch/jobs",r:"Rotes Kreuz — endlich eine Organisation mit wirklich gutem Logo.",p:"CHF 110–130k",g:["NGO","GS","Soziales"]},
-      {t:"Bereichsleiter Umwelt & Energie",o:"WWF Region Basel",l:"Basel",s:"wwf.ch/de/jobs",r:"Jens kämpft für die Welt — die Welt kämpft gegen seine Pendlerpauschale.",p:"CHF 95–115k",g:["NGO","Umwelt","80–100%"]},
-    ]
-  },
-  akademisch: {
-    c: "Das Amt nimmt zur Kenntnis, dass der promovierte Jurist eine akademische Laufbahn anstrebt. Das Doktorat ist vorhanden. Die Bescheidenheit leider auch.",
-    j: [
-      {t:"Verwaltungsdirektor",o:"Universität Basel",l:"Basel",s:"unibas.ch/jobs",r:"Die älteste Universität der Schweiz braucht jemanden der Formulare kennt.",p:"CHF 150–175k",g:["Uni","Direktor","100%"]},
-      {t:"Generalsekretär",o:"Fachhochschule Nordwestschweiz FHNW",l:"Muttenz / Basel",s:"fhnw.ch/jobs",r:"Vier Kantone, eine Hochschule, unendlich Sitzungen — Jens' natürliches Habitat.",p:"CHF 140–165k",g:["FH","GS","Kader"]},
-      {t:"Leiter Administration & Services",o:"Friedrich Miescher Institute",l:"Basel",s:"fmi.ch/jobs",r:"Weltklasse-Forschung verwalten — Jens muss nicht verstehen was sie forschen.",p:"CHF 125–145k",g:["Forschung","Leitung","International"]},
-      {t:"Campus Manager",o:"European School Basel",l:"Münchenbuchsee",s:"esb.ch/jobs",r:"Schule für Diplomatenkinder — wo Schweizer Verwaltungssprache Exotik ist.",p:"CHF 110–130k",g:["Schule","Kader","International"]},
-      {t:"Abteilungsleiter Forschungsförderung",o:"Swiss National Science Foundation",l:"Bern / Basel",s:"snf.ch/jobs",r:"Geld verteilen an kluge Leute — endlich ein Job der zur Persönlichkeit passt.",p:"CHF 130–150k",g:["SNSF","Leitung","Wissenschaft"]},
-    ]
-  },
-  wildcard: {
-    c: "Das Amt hat im Rahmen einer ausserordentlichen Sitzung beschlossen, vollständig auf Jens' Qualifikationsprofil zu verzichten. Als Rennvelofahrer hat er Ausdauer. Das muss reichen.",
-    j: [
-      {t:"Kurdirektor",o:"Gemeinde Binz (Rügen)",l:"Rügen, DE",s:"binz.de/jobs",r:"Meer inklusive — van der Meer leitet van dem Meer. Das Schicksal wäre komplett.",p:"EUR 85–105k",g:["Meer!","Tourismus","Direktor"]},
-      {t:"Lotteriefonds-Verwalter",o:"Kanton Basel-Stadt",l:"Basel",s:"bs.ch/lotterie",r:"Anderen Leuten ihr Glück verwalten — was Jens eigentlich schon immer getan hat.",p:"CHF 120–140k",g:["Lotterie","Kanton","Kurios"]},
-      {t:"Hafenkapitän",o:"Rheinhäfen Basel",l:"Basel",s:"rheinhaefen.ch/jobs",r:"Van der Meer leitet den Hafen — linguistisch die einzig vertretbare Option.",p:"CHF 130–155k",g:["Hafen","Meer","Chef"]},
-      {t:"Leiter Zoo-Verwaltung",o:"Zoologischer Garten Basel",l:"Basel",s:"zoobasel.ch/jobs",r:"Tiere verwalten ist wie Gemeindeverwaltung, nur die Bewohner sind bissiger.",p:"CHF 115–135k",g:["Zoo","Kurios","Leitung"]},
-      {t:"Chief Happiness Officer",o:"Baloise Group",l:"Basel",s:"baloise.com/jobs",r:"Diese Stelle existiert wirklich. Das sagt alles über die Privatwirtschaft.",p:"CHF 140–170k",g:["CHO","WTF","Happiness"]},
-    ]
-  }
+/* DATA */
+const D={
+  verwaltung:{c:"Das Amt freut sich, Herrn Dr. van der Meer mitteilen zu dürfen, dass seine bisherigen Leistungen als solide bezeichnet werden können — im Sinne von: er hat nie etwas Bemerkenswertes getan. Die folgenden Stellen bieten die Möglichkeit, dieses Kunststück zu wiederholen.",j:[
+    {t:"Abteilungsleiter Einwohnerdienste",o:"Gemeinde Muttenz",l:"Muttenz BL",s:"gemeinde-muttenz.ch",r:"Identische Stelle, anderes Dorf — Jens würde es nach zwei Wochen nicht merken.",p:"CHF 110–125k",g:["100%","Verwaltung"]},
+    {t:"Stv. Gemeindeschreiber",o:"Gemeinde Binningen",l:"Binningen BL",s:"binningen.ch",r:"Stellvertreter: genug Verantwortung um wichtig zu wirken, zu wenig um Fehler zu machen.",p:"CHF 105–118k",g:["Kader","Öffentlich"]},
+    {t:"Leiter Stadtentwicklung",o:"Stadt Liestal",l:"Liestal BL",s:"liestal.ch",r:"Stadtentwicklung einer Stadt die sich seit 1972 nicht entwickelt hat.",p:"CHF 115–130k",g:["Leitung","Kanton"]},
+    {t:"Bereichsleiter Soziales",o:"Kanton Basel-Landschaft",l:"Liestal BL",s:"baselland.ch",r:"Mehr Bürokratie, mehr Budget, mehr Sitzungen — Jens in seinem natürlichen Habitat.",p:"CHF 120–140k",g:["Kanton","Führung"]},
+    {t:"Generalsekretär",o:"Verband Baselbieter Gemeinden",l:"Aesch BL",s:"vbg-bl.ch",r:"Chef aller Gemeinden — der logische nächste Schritt nach einer Gemeinde.",p:"CHF 130–150k",g:["CEO","Verband"]},
+  ]},
+  privat:{c:"Das Amt vermerkt mit verhaltener Begeisterung, dass der promovierte Jurist die öffentliche Hand verlassen möchte. Die Privatwirtschaft wurde über seine Ankunft noch nicht informiert.",j:[
+    {t:"Head of Corporate Affairs",o:"Novartis AG",l:"Basel",s:"novartis.com",r:"Jens verbringt die erste Woche damit, das Organigramm zu verstehen.",p:"CHF 160–200k",g:["Pharma","Englisch"]},
+    {t:"Leiter Public Affairs",o:"Roche Holding AG",l:"Basel",s:"roche.com",r:"Behördensprache als Beruf — Dr. van der Meer ist qualified by accident.",p:"CHF 150–185k",g:["Roche","Politik"]},
+    {t:"Geschäftsführer Region Nord",o:"Helvetia Versicherungen",l:"Basel",s:"helvetia.ch",r:"Versicherungen verkaufen sich ähnlich wie Gemeindeprospekte.",p:"CHF 140–170k",g:["Versicherung","GF"]},
+    {t:"Managing Director Schweiz",o:"BKW Energie AG",l:"Basel",s:"bkw.ch",r:"Energie — nicht die Art die Jens nach dem Mittagessen ausstrahlt.",p:"CHF 155–190k",g:["Energie","MD"]},
+    {t:"Direktor Facility Management",o:"Swiss Prime Site",l:"Basel",s:"sps.swiss",r:"Gebäude verwalten statt Menschen — eine Qualitätssteigerung für alle.",p:"CHF 135–160k",g:["Immobilien","FM"]},
+  ]},
+  fuehrung:{c:"Das Amt registriert den Wunsch nach einer Führungsposition mit leiser Skepsis. Herr Dr. van der Meer leitet bereits 700 Mitarbeitende. Mehr war offenbar nicht genug.",j:[
+    {t:"CEO",o:"IWB — Industrielle Werke Basel",l:"Basel",s:"iwb.ch",r:"Wasserversorgung, Strom, Gas für ganz Basel — was könnte schon schiefgehen.",p:"CHF 250–320k",g:["CEO","Stadtwerk"]},
+    {t:"Stadtpräsident ad interim",o:"Stadt Laufen",l:"Laufen BL",s:"laufen.ch",r:"Chef einer ganzen Stadt — zugegeben, es ist Laufen, aber immerhin.",p:"CHF 145–165k",g:["CEO","Politik"]},
+    {t:"Generaldirektor",o:"Kantonsspital Baselland",l:"Bruderholz",s:"ksbl.ch",r:"Ein Spital leiten ohne Medizinstudium — in der Schweiz möglich.",p:"CHF 280–350k",g:["GD","Spital"]},
+    {t:"Direktor Messe Basel",o:"MCH Group AG",l:"Basel",s:"mch-group.com",r:"Art Basel — als Fasnächtler fühlt sich Jens sofort wohl.",p:"CHF 230–290k",g:["Direktor","Events"]},
+    {t:"CEO",o:"Basler Verkehrs-Betriebe BVB",l:"Basel",s:"bvb.ch",r:"Trams leiten — die Leute werden wütend wenn es zu spät kommt.",p:"CHF 240–300k",g:["CEO","Tram"]},
+  ]},
+  sinn:{c:"Das Amt begrüsst den Wunsch nach sinnstiftender Tätigkeit. Als Vater von drei Kindern versteht Dr. van der Meer Gemeinschaft. Die Frage ist ob die Gemeinschaft das weiss.",j:[
+    {t:"Geschäftsführer",o:"Pro Infirmis Basel",l:"Basel",s:"proinfirmis.ch",r:"Menschen helfen statt Formulare abzeichnen — ein radikaler Karriereschritt.",p:"CHF 115–135k",g:["NGO","Soziales"]},
+    {t:"Direktor",o:"Swiss Tropical & Public Health Institute",l:"Basel",s:"swisstph.ch",r:"Tropenmedizin ohne Tropen — typisch Basel.",p:"CHF 130–155k",g:["Institut","Global"]},
+    {t:"Stiftungsleitung",o:"Christoph Merian Stiftung",l:"Basel",s:"cms-basel.ch",r:"Eine der reichsten Stiftungen der Schweiz — der Sinn ist inklusive.",p:"CHF 140–170k",g:["Stiftung","Kultur"]},
+    {t:"Generalsekretär",o:"SRK Kantonalverband Basel",l:"Basel",s:"srk-bs.ch",r:"Rotes Kreuz — endlich eine Organisation mit gutem Logo.",p:"CHF 110–130k",g:["NGO","GS"]},
+    {t:"Bereichsleiter Umwelt",o:"WWF Region Basel",l:"Basel",s:"wwf.ch",r:"Jens kämpft für die Welt — die Welt kämpft gegen seine Pendlerpauschale.",p:"CHF 95–115k",g:["NGO","Umwelt"]},
+  ]},
+  uni:{c:"Das Amt nimmt zur Kenntnis, dass der promovierte Jurist eine akademische Laufbahn anstrebt. Das Doktorat ist vorhanden. Die Bescheidenheit leider auch.",j:[
+    {t:"Verwaltungsdirektor",o:"Universität Basel",l:"Basel",s:"unibas.ch",r:"Die älteste Uni der Schweiz braucht jemanden der Formulare kennt.",p:"CHF 150–175k",g:["Uni","Direktor"]},
+    {t:"Generalsekretär",o:"FHNW",l:"Muttenz / Basel",s:"fhnw.ch",r:"Vier Kantone, eine Hochschule, unendlich Sitzungen — Jens' Heimat.",p:"CHF 140–165k",g:["FH","GS"]},
+    {t:"Leiter Administration",o:"Friedrich Miescher Institute",l:"Basel",s:"fmi.ch",r:"Weltklasse-Forschung verwalten — Jens muss nur die Budgets kennen.",p:"CHF 125–145k",g:["Forschung","Leitung"]},
+    {t:"Campus Manager",o:"European School Basel",l:"Münchenbuchsee",s:"esb.ch",r:"Schule für Diplomatenkinder — wo Schweizer Verwaltungssprache Exotik ist.",p:"CHF 110–130k",g:["Schule","International"]},
+    {t:"Abteilungsleiter Forschungsförderung",o:"Swiss National Science Foundation",l:"Bern/Basel",s:"snf.ch",r:"Geld verteilen an kluge Leute — endlich passend.",p:"CHF 130–150k",g:["SNSF","Wissenschaft"]},
+  ]},
+  wild:{c:"Das Amt hat beschlossen, vollständig auf Jens' Qualifikationsprofil zu verzichten. Als Rennvelofahrer hat er Ausdauer. Das muss reichen.",j:[
+    {t:"Kurdirektor",o:"Gemeinde Binz (Rügen)",l:"Rügen, DE",s:"binz.de",r:"Meer inklusive — van der Meer leitet van dem Meer.",p:"EUR 85–105k",g:["Meer!","Tourismus"]},
+    {t:"Lotteriefonds-Verwalter",o:"Kanton Basel-Stadt",l:"Basel",s:"bs.ch",r:"Anderen Leuten ihr Glück verwalten — was Jens schon immer getan hat.",p:"CHF 120–140k",g:["Lotterie","Kurios"]},
+    {t:"Hafenkapitän",o:"Rheinhäfen Basel",l:"Basel",s:"rheinhaefen.ch",r:"Van der Meer leitet den Hafen — linguistisch die einzig vertretbare Option.",p:"CHF 130–155k",g:["Hafen","Meer"]},
+    {t:"Leiter Zoo-Verwaltung",o:"Zoologischer Garten Basel",l:"Basel",s:"zoobasel.ch",r:"Tiere verwalten — die Bewohner sind bissiger als in Riehen.",p:"CHF 115–135k",g:["Zoo","Kurios"]},
+    {t:"Chief Happiness Officer",o:"Baloise Group",l:"Basel",s:"baloise.com",r:"Diese Stelle existiert wirklich. Das sagt alles über die Privatwirtschaft.",p:"CHF 140–170k",g:["CHO","WTF"]},
+  ]},
 };
 
-const LOADS = {
-  verwaltung:       ['Durchsuche Gemeinderäte…','Prüfe Verwaltungsstellen…','Finde bürokratische Heimat…'],
-  privatwirtschaft: ['Verlasse sicheren Hafen…','Suche Bonus-Kultur…','Prüfe Firmenwagen-Optionen…'],
-  fuehrung:         ['Prüfe CEO-Stühle…','Suche Direktionsstellen…','Messe Bürogrösse…'],
-  sinnstiftend:     ['Suche höheren Zweck…','Prüfe Weltrettungspotenzial…','Kalkuliere Sinngehalt…'],
-  akademisch:       ['Durchsuche Hörsäle…','Prüfe unibas.ch…','Suche Professorenstühle…'],
-  wildcard:         ['Würfle Karriere…','Konsultiere Sterne…','Ignoriere Qualifikationen…'],
+const LD={
+  verwaltung:['Durchsuche Gemeinderäte…','Prüfe Verwaltungsstellen…'],
+  privat:['Verlasse sicheren Hafen…','Prüfe Firmenwagen-Optionen…'],
+  fuehrung:['Prüfe CEO-Stühle…','Messe Bürogrösse…'],
+  sinn:['Suche höheren Zweck…','Kalkuliere Sinngehalt…'],
+  uni:['Durchsuche Hörsäle…','Prüfe unibas.ch…'],
+  wild:['Würfle Karriere…','Ignoriere Qualifikationen…'],
 };
 
-let activeBtn = null, twH = null;
+let activeBtn=null,twH=null;
 
-function doSearch(btn, cat){
-  if(activeBtn){ activeBtn.classList.remove('on'); }
-  btn.classList.add('on');
-  activeBtn = btn;
-
-  sc++;
-  sessionStorage.setItem('jc', sc);
-  countUp(document.getElementById('sc'), sc);
-
-  document.getElementById('empty').style.display = 'none';
+function go(btn,cat){
+  if(activeBtn)activeBtn.classList.remove('on');
+  btn.classList.add('on');activeBtn=btn;
+  sc++;sessionStorage.setItem('jc',sc);countUp(document.getElementById('sc'),sc);
+  document.getElementById('empty').style.display='none';
   document.getElementById('rmeta').classList.remove('on');
-  const ab = document.getElementById('aibar');
-  ab.classList.remove('on');
-  document.getElementById('grid').innerHTML = '';
-  document.getElementById('qbox').style.display = 'none';
-
-  const loader = document.getElementById('loader');
-  const lt = document.getElementById('ltxt');
+  document.getElementById('aibar').classList.remove('on');
+  document.getElementById('grid').innerHTML='';
+  document.getElementById('qbox').style.display='none';
+  const loader=document.getElementById('loader'),ltxt=document.getElementById('ltxt');
   loader.classList.add('on');
-
-  const txts = LOADS[cat]; let li = 0;
-  function nxt(){
-    if(twH) clearInterval(twH);
-    twH = tw(lt, txts[li % txts.length], 26, () => { li++; if(li < txts.length) setTimeout(nxt, 400); });
-  }
+  const txts=LD[cat];let li=0;
+  function nxt(){if(twH)clearInterval(twH);twH=tw(ltxt,txts[li%txts.length],28,()=>{li++;if(li<txts.length)setTimeout(nxt,500)});}
   nxt();
-
-  setTimeout(() => {
-    if(twH) clearInterval(twH);
-    loader.classList.remove('on');
-    render(DATA[cat], cat);
-  }, 1900 + Math.random() * 500);
+  setTimeout(()=>{if(twH)clearInterval(twH);loader.classList.remove('on');render(D[cat],cat);},1800+Math.random()*500);
 }
 
-function render(data, cat){
-  const jobs = data.j;
-
-  const rc = document.getElementById('rcount');
-  rc.classList.remove('pop');
-  void rc.offsetWidth;
-  rc.classList.add('pop');
-  rc.textContent = jobs.length;
-
-  document.getElementById('rclbl').textContent = `Stellen · ${cat}`;
+function render(data,cat){
+  const jobs=data.j;
+  const rc=document.getElementById('rcount');
+  rc.classList.remove('pop');void rc.offsetWidth;rc.classList.add('pop');
+  rc.textContent=jobs.length;
+  document.getElementById('rclbl').textContent='Stellen · '+cat;
   document.getElementById('rmeta').classList.add('on');
-
-  const now = new Date();
-  document.getElementById('rtime').textContent =
-    `Aktualisiert\n${now.toLocaleDateString('de-CH')} · ${now.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'})}`;
-
-  document.getElementById('aitxt').textContent = '';
+  const now=new Date();
+  document.getElementById('rtime').textContent='Aktualisiert\n'+now.toLocaleDateString('de-CH')+' · '+now.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('aitxt').textContent='';
   document.getElementById('aibar').classList.add('on');
-  tw(document.getElementById('aitxt'), data.c, 14);
-
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
-
-  jobs.forEach((job, i) => {
-    const tagsH = job.g.map((t,ti) => `<span class="tag${ti===0?' hi':''}">${t}</span>`).join('');
-    const card = document.createElement('div');
-    card.className = 'jcard';
-    card.innerHTML = `
-      <div class="jtop">
-        <div class="jnum">${String(i+1).padStart(2,'0')} / ${String(jobs.length).padStart(2,'0')}</div>
-        <div class="jtags">${tagsH}</div>
-      </div>
-      <div class="jtitle" id="jt${i}"></div>
-      <div class="jorg"   id="jo${i}"></div>
-      <div class="jremark"id="jr${i}"></div>
-      <div class="jfoot">
-        <div class="jsrc">via ${job.s}</div>
-        <div class="jsalary">${job.p}</div>
-      </div>`;
+  tw(document.getElementById('aitxt'),data.c,14);
+  const grid=document.getElementById('grid');grid.innerHTML='';
+  jobs.forEach((job,i)=>{
+    const tH=job.g.map((t,ti)=>`<span class="tag${ti===0?' hi':''}">${t}</span>`).join('');
+    const card=document.createElement('div');card.className='jcard';
+    card.innerHTML=`<div class="jtop"><div class="jnum">${String(i+1).padStart(2,'0')}/${jobs.length}</div><div class="jtags">${tH}</div></div><div class="jtitle" id="jt${i}"></div><div class="jorg" id="jo${i}"></div><div class="jremark" id="jr${i}"></div><div class="jfoot"><div class="jsrc">via ${job.s}</div><div class="jsalary">${job.p}</div></div>`;
     grid.appendChild(card);
-
-    setTimeout(() => card.classList.add('in'), i * 55);
-    const d = i * 150;
-    setTimeout(() => tw(document.getElementById(`jt${i}`), job.t, 24), d);
-    setTimeout(() => tw(document.getElementById(`jo${i}`), `${job.o} · ${job.l}`, 14), d + 300);
-    setTimeout(() => tw(document.getElementById(`jr${i}`), job.r, 11), d + 580);
+    setTimeout(()=>card.classList.add('in'),i*50);
+    setTimeout(()=>tw(document.getElementById('jt'+i),job.t,22),i*140);
+    setTimeout(()=>tw(document.getElementById('jo'+i),job.o+' · '+job.l,12),i*140+280);
+    setTimeout(()=>tw(document.getElementById('jr'+i),job.r,10),i*140+520);
   });
-
-  setTimeout(() => {
-    const qb = document.getElementById('qbox');
-    qb.style.display = 'block';
-    renderQ(0);
-    buildDots();
-  }, jobs.length * 150 + 700);
+  setTimeout(()=>{document.getElementById('qbox').style.display='block';renderQ(0);buildDots();},jobs.length*140+650);
 }
 
-/* ═══ QUOTES ═══ */
-const QS = [
-  {q:"Er kommt jeden Morgen mit seiner Tochter zur Arbeit spaziert und biegt dann links ab ins Gemeindehaus. Ich biege rechts ab. Das sagt eigentlich alles.",n:"M. H.",r:"Abt. Publikumsdienste · 6 Jahre",a:"MH"},
-  {q:"Dr. van der Meer hat eine Arbeitsgruppe namens «Systempflege» gegründet. Ich bin seit drei Jahren Mitglied. Wir haben noch kein einziges System gepflegt.",n:"K. B.",r:"Stabsstelle Controlling · 9 Jahre",a:"KB"},
-  {q:"Er sagt immer, er möchte «Doppelspurigkeiten abbauen». Wir haben jetzt drei Arbeitsgruppen die sich mit Doppelspurigkeiten befassen.",n:"T. S.",r:"Abt. Finanzen · 4 Jahre",a:"TS"},
-  {q:"Als Fasnächtler bringt er jedes Jahr Kostüm-Energie ins Büro. Als Verwaltungsleiter schreibt er dann eine 14-seitige Weisung über Kostüme am Arbeitsplatz.",n:"L. F.",r:"Fachbereich Recht · 7 Jahre",a:"LF"},
-  {q:"Er hat uns mitgeteilt, dass seine Arbeitstage sehr lang sind, geniesst aber den kurzen Heimweg. Unsere Arbeitstage sind auch lang. Wir wohnen nicht in Riehen.",n:"P. W.",r:"Abt. Raumentwicklung · 11 Jahre",a:"PW"},
-  {q:"Als promovierter Jurist erklärt er uns regelmässig, was Begriffe bedeuten, die wir selbst erfunden haben. Das nennt er «Wissenstransfer».",n:"A. M.",r:"Stabsstelle Personal · 5 Jahre",a:"AM"},
+/* QUOTES */
+const QS=[
+  {q:"Er kommt jeden Morgen mit seiner Tochter zur Arbeit spaziert und biegt dann links ab ins Gemeindehaus. Ich biege rechts ab. Das sagt eigentlich alles.",n:"M. H.",r:"Abt. Publikumsdienste · 6 J.",a:"MH"},
+  {q:"Dr. van der Meer hat eine Arbeitsgruppe «Systempflege» gegründet. Ich bin seit drei Jahren Mitglied. Wir haben noch kein einziges System gepflegt.",n:"K. B.",r:"Stabsstelle Controlling · 9 J.",a:"KB"},
+  {q:"Er sagt immer, er möchte «Doppelspurigkeiten abbauen». Wir haben jetzt drei Arbeitsgruppen die sich mit Doppelspurigkeiten befassen.",n:"T. S.",r:"Abt. Finanzen · 4 J.",a:"TS"},
+  {q:"Als Fasnächtler bringt er jedes Jahr Kostüm-Energie ins Büro. Als Verwaltungsleiter schreibt er dann eine 14-seitige Weisung über Kostüme am Arbeitsplatz.",n:"L. F.",r:"Fachbereich Recht · 7 J.",a:"LF"},
+  {q:"Er hat uns mitgeteilt, dass seine Arbeitstage sehr lang sind, geniesst aber den kurzen Heimweg. Wir wohnen nicht in Riehen.",n:"P. W.",r:"Abt. Raumentwicklung · 11 J.",a:"PW"},
+  {q:"Als promovierter Jurist erklärt er uns regelmässig, was Begriffe bedeuten, die wir selbst erfunden haben. Das nennt er «Wissenstransfer».",n:"A. M.",r:"Stabsstelle Personal · 5 J.",a:"AM"},
 ];
-
-let qi = 0;
-
+let qi=0;
 function buildDots(){
-  const d = document.getElementById('qdots');
-  d.innerHTML = '';
-  QS.forEach((_,i) => {
-    const dot = document.createElement('div');
-    dot.className = 'qdot' + (i === qi ? ' on' : '');
-    dot.onclick = () => goQ(i);
-    d.appendChild(dot);
-  });
-  document.getElementById('qct').textContent = QS.length;
+  const d=document.getElementById('qdots');d.innerHTML='';
+  QS.forEach((_,i)=>{const dot=document.createElement('div');dot.className='qdot'+(i===qi?' on':'');dot.onclick=()=>goQ(i);d.appendChild(dot);});
 }
-
 function renderQ(idx){
-  const q = QS[idx];
-  document.getElementById('qq').textContent = q.q;
-  document.getElementById('qn').textContent = q.n;
-  document.getElementById('qr').textContent = q.r + ' · GV Riehen';
-  document.getElementById('qava').textContent = q.a;
-  document.getElementById('qci').textContent = idx + 1;
-  document.querySelectorAll('.qdot').forEach((d,i) => d.classList.toggle('on', i === idx));
+  const q=QS[idx];
+  document.getElementById('qq').textContent=q.q;
+  document.getElementById('qn').textContent=q.n;
+  document.getElementById('qr').textContent=q.r+' · GV Riehen';
+  document.getElementById('qava').textContent=q.a;
+  document.getElementById('qprog').textContent=(idx+1)+' / '+QS.length;
+  document.querySelectorAll('.qdot').forEach((d,i)=>d.classList.toggle('on',i===idx));
 }
-
-function goQ(idx){
-  const b = document.getElementById('qbody');
-  b.classList.add('fade');
-  setTimeout(() => { qi = idx; renderQ(qi); b.classList.remove('fade'); }, 270);
-}
-
-function qmove(dir){ goQ((qi + dir + QS.length) % QS.length); }
-
-document.addEventListener('keydown', e => {
-  if(document.getElementById('qbox').style.display === 'none') return;
-  if(e.key === 'ArrowRight') qmove(1);
-  if(e.key === 'ArrowLeft')  qmove(-1);
+function goQ(idx){const b=document.getElementById('qbody');b.classList.add('fade');setTimeout(()=>{qi=idx;renderQ(qi);b.classList.remove('fade');},240);}
+function qmove(dir){goQ((qi+dir+QS.length)%QS.length);}
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('qbox').style.display==='none')return;
+  if(e.key==='ArrowRight')qmove(1);if(e.key==='ArrowLeft')qmove(-1);
 });
 
-/* ═══ PORTALS ═══ */
-const PORTALS = [
-  {n:"jobs.ch",             d:"Grösste Schweizer Jobbörse — Kader Basel",             tag:"Kader",      u:"https://www.jobs.ch/de/stellenangebote/?location=Basel&radius=30&q=leitung+kader", cats:["alle","kader"]},
-  {n:"managementstellen.ch",d:"CEO & Top-Kader Stellen Schweiz",                       tag:"Management", u:"https://managementstellen.ch/ceo-jobs",                                           cats:["alle","management","kader"]},
-  {n:"jobscout24.ch",       d:"Kaderstellen Basel — täglich neue Führungspositionen",  tag:"Kader",      u:"https://www.jobscout24.ch/de/jobs-in-basel/kader/",                               cats:["alle","kader"]},
-  {n:"Universität Basel",   d:"Offene Stellen — Verwaltung & Leitung",                 tag:"Akademisch", u:"https://www.unibas.ch/de/Jobs-und-Karriere/Offene-Stellen.html",                 cats:["alle","akademisch"]},
-  {n:"Kanton Basel-Stadt",  d:"Stellenangebote Kanton — die seitliche Aufstiegsoption",tag:"Öffentlich", u:"https://www.bs.ch/themen/arbeit-und-soziales/jobs-beim-kanton",                  cats:["alle","oeffentlich"]},
-  {n:"jobagent.ch",         d:"Alle Kaderjobs Grossraum Basel",                        tag:"Kader",      u:"https://www.jobagent.ch/jobs/Region-Basel",                                       cats:["alle","kader"]},
-  {n:"Gemeinde Riehen",     d:"Offene Stellen — falls er doch bleibt (unwahrscheinlich)", tag:"Öffentlich", u:"https://www.riehen.ch/verwaltung/offene-stellen",                             cats:["alle","oeffentlich"]},
-  {n:"FHNW",                d:"Fachhochschule — Leitungs- & Verwaltungsrollen",        tag:"Akademisch", u:"https://www.fhnw.ch/de/die-fhnw/jobs",                                           cats:["alle","akademisch"]},
-  {n:"LinkedIn Schweiz",    d:"Führungspositionen Basel mit Netzwerkeffekt",            tag:"Management", u:"https://www.linkedin.com/jobs/search/?keywords=Verwaltungsleiter+Direktor&location=Basel", cats:["alle","management","kader"]},
-  {n:"Kanton Baselland",    d:"Stellenangebote BL — Aufstieg ohne Umzug",              tag:"Öffentlich", u:"https://www.baselland.ch/politik-und-behorden/direktionen/finanz-und-kirchendirektion/personal/offene-stellen", cats:["alle","oeffentlich"]},
-  {n:"Swiss Science Foundation", d:"SNSF Jobs — Forschungsförderung leiten",          tag:"Akademisch", u:"https://www.snf.ch/de/wir-sind-der-snf/stellenangebote",                        cats:["alle","akademisch"]},
-  {n:"Gemeinde Muttenz",    d:"Offene Stellen — Muttenz sucht jemanden wie Jens",      tag:"Öffentlich", u:"https://www.muttenz.ch/de/verwaltung/offene-stellen",                            cats:["alle","oeffentlich"]},
+/* PORTALS */
+const P=[
+  {n:"jobs.ch",d:"Grösste Schweizer Jobbörse — Kader Basel",t:"Kader",u:"https://www.jobs.ch/de/stellenangebote/?location=Basel&radius=30&q=leitung+kader",c:["alle","kader"]},
+  {n:"managementstellen.ch",d:"CEO & Top-Kader Stellen Schweiz",t:"Management",u:"https://managementstellen.ch/ceo-jobs",c:["alle","mgmt","kader"]},
+  {n:"jobscout24.ch",d:"Kaderstellen Basel — täglich neue Positionen",t:"Kader",u:"https://www.jobscout24.ch/de/jobs-in-basel/kader/",c:["alle","kader"]},
+  {n:"Universität Basel",d:"Offene Stellen — Verwaltung & Leitung",t:"Akademisch",u:"https://www.unibas.ch/de/Jobs-und-Karriere/Offene-Stellen.html",c:["alle","aka"]},
+  {n:"Kanton Basel-Stadt",d:"Stellenangebote Kanton BS",t:"Öffentlich",u:"https://www.bs.ch/themen/arbeit-und-soziales/jobs-beim-kanton",c:["alle","pub"]},
+  {n:"jobagent.ch",d:"Alle Kaderjobs Grossraum Basel",t:"Kader",u:"https://www.jobagent.ch/jobs/Region-Basel",c:["alle","kader"]},
+  {n:"Gemeinde Riehen",d:"Offene Stellen — falls er doch bleibt",t:"Öffentlich",u:"https://www.riehen.ch/verwaltung/offene-stellen",c:["alle","pub"]},
+  {n:"FHNW",d:"Fachhochschule — Leitungs- & Verwaltungsrollen",t:"Akademisch",u:"https://www.fhnw.ch/de/die-fhnw/jobs",c:["alle","aka"]},
+  {n:"LinkedIn Schweiz",d:"Führungspositionen Basel mit Netzwerkeffekt",t:"Management",u:"https://www.linkedin.com/jobs/search/?keywords=Verwaltungsleiter+Direktor&location=Basel",c:["alle","mgmt","kader"]},
+  {n:"Kanton Baselland",d:"Stellenangebote BL — Aufstieg ohne Umzug",t:"Öffentlich",u:"https://www.baselland.ch/politik-und-behorden/direktionen/finanz-und-kirchendirektion/personal/offene-stellen",c:["alle","pub"]},
+  {n:"Swiss Science Foundation",d:"SNSF Jobs — Forschungsförderung leiten",t:"Akademisch",u:"https://www.snf.ch/de/wir-sind-der-snf/stellenangebote",c:["alle","aka"]},
+  {n:"Gemeinde Muttenz",d:"Offene Stellen — Muttenz sucht jemanden wie Jens",t:"Öffentlich",u:"https://www.muttenz.ch/de/verwaltung/offene-stellen",c:["alle","pub"]},
 ];
-
-function buildPrt(f){
-  const g = document.getElementById('pgrid');
-  g.innerHTML = '';
-  PORTALS.filter(p => p.cats.includes(f)).forEach(p => {
-    const a = document.createElement('a');
-    a.href = p.u;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.className = 'plink';
-    a.innerHTML = `
-      <div class="pltop">
-        <div class="plname">${p.n}</div>
-        <div class="pltag">${p.tag}</div>
-      </div>
-      <div class="pldesc">${p.d}</div>
-      <div class="plfoot">
-        <div class="plurl">${new URL(p.u).hostname}</div>
-        <div class="pl-arrow">→</div>
-      </div>`;
+function buildP(f){
+  const g=document.getElementById('pgrid');g.innerHTML='';
+  P.filter(p=>p.c.includes(f)).forEach(p=>{
+    const a=document.createElement('a');a.href=p.u;a.target='_blank';a.rel='noopener';a.className='plink';
+    a.innerHTML=`<div class="pltop"><div class="plname">${p.n}</div><div class="pltag">${p.t}</div></div><div class="pldesc">${p.d}</div><div class="plfoot"><div class="plurl">${new URL(p.u).hostname}</div><div class="pl-arr">→</div></div>`;
     g.appendChild(a);
   });
 }
-
-function fprt(btn, f){
-  document.querySelectorAll('.pfil').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  buildPrt(f);
+function fp(btn,f){document.querySelectorAll('.pfil').forEach(b=>b.classList.remove('on'));btn.classList.add('on');buildP(f);}
+function toggleP(){
+  const btn=document.getElementById('pbtn'),wrap=document.getElementById('pgrid-wrap'),fils=document.getElementById('pfils');
+  const open=btn.getAttribute('aria-expanded')==='true';
+  btn.setAttribute('aria-expanded',!open);wrap.classList.toggle('open',!open);fils.classList.toggle('open',!open);
 }
-
-function togglePbox(){
-  const hdr  = document.getElementById('pbox-hdr');
-  const wrap = document.getElementById('pgrid-wrap');
-  const fils = document.getElementById('pfils');
-  const isOpen = hdr.getAttribute('aria-expanded') === 'true';
-  hdr.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-  wrap.classList.toggle('open', !isOpen);
-  fils.classList.toggle('open', !isOpen);
-}
-
-buildPrt('alle');
+buildP('alle');
 </script>
 
 </body>
